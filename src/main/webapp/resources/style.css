@@ -1,0 +1,87 @@
+body{
+	background-color: #fff;
+}
+
+a{
+	font-size: 14px;
+	color: #003366;
+	text-decoration: none;
+	font-family: sans-serif;
+}
+}
+
+a:hover{
+	color: #000033;
+	text-decoration: underline;
+}
+div#userInfo{
+	float: right;
+	text-align: right;
+}
+
+div#headerLinks{
+	float: left;
+}
+
+div#headerContainer{
+	border: 1px solid #ccc;
+}
+
+div#objekt_muugiarved{
+	float: right;
+}
+
+div#objekt_ostuarved{
+	float: left;
+}
+
+.tabel {
+	border-width: 1px;
+	border-color: #000;
+}
+
+tr.tableRow{
+	background-color: #fff;
+}
+
+tr.tableRow:hover{
+	background-color: #ffffaa;
+}
+
+td.tableColumn {
+	border: 1px solid black;
+	padding: 3px;
+}
+input {
+	border: 1px solid black;
+	padding: 3px;
+}
+
+input.kuuPaev {
+	width: 88px;
+}
+
+
+
+input.arveNumber{
+	width: 110px;
+}
+
+input.summaKM{
+	width: 88px;
+}
+input.summaIlmaKM{
+	width: 88px;
+}
+
+input.muugiMees{
+	width: 100px;	
+}
+
+td.summaKM {
+	text-align: right;
+}
+
+td.summaIlmaKM {
+	text-align: right;
+}
