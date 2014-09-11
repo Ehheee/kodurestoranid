@@ -7,7 +7,7 @@ import java.util.Map;
 
 public class Thing {
 
-	//Map of relations for current String. Relation name used as key.
+	//Map of relations for current String. Relation id used as key.
 	private Map<String, ThingRelation> relations;
 	//Labels are hierarchical so 0 index is the root and the rest follow in order
 	private List<String> labels;

@@ -1,40 +1,55 @@
 package tests;
 
-import java.util.List;
+import java.sql.Types;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
-
-import javax.sql.RowSet;
 
 import org.apache.commons.dbcp.BasicDataSource;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 
-import thething.kodurestoranid.dataobjects.ThingNode;
-import thething.kodurestoranid.db.mapping.ThingNodeMapper;
+import thething.kodurestoranid.db.dataaccess.UniqueIdProvider;
+import thething.kodurestoranid.db.mapping.NeoResultSetExtractor;
 
 public class A1 {
-	static String query = "select o1.*, o2.*, o3.* from objects o1" 
-			+" left join objectRelations or1 on o1.id=or1.objectId or o1.id=or1.relationId" 
-			+" left join objects o2 on (or1.relationId=o2.id or or1.objectId=o2.id) and o2.id != o1.id" 
-			+" left join objectRelations or2 on o2.id = or2.objectId or o2.id = or2.relationId"
-			+" left join objects o3 on (or2.relationId=o3.id or or2.objectId=o3.id) and o3.id != o2.id and o3.id != o1.id"
-			+" where o1.id=1;";
+
+	private static String query1 = "MATCH (a:System) WHERE a.id IN {1} RETURN a";
+	private static String query2 = "MATCH (a:System) WHERE a.id IN &ids RETURN a";
+	private static String query3 = "CREATE (n:System:Test &props)";
 	
+	private static NeoResultSetExtractor extractor = new NeoResultSetExtractor();
 	public static void main(String[] args){
 		BasicDataSource ds2 = new BasicDataSource();
-		ds2.setDriverClassName("org.postgresql.Driver");
-		ds2.setUsername("kodurestoranid");
-		ds2.setPassword("nhf3484bvcr");
-		ds2.setUrl("jdbc:postgresql://localhost:5432/kodurestoranid?useUnicode=true&amp;characterEncoding=utf8");
+		ds2.setDriverClassName("org.neo4j.jdbc.Driver");
+		ds2.setUrl("jdbc:neo4j://localhost:7474/?debug=true");
 		ds2.setMaxActive(10);
 		ds2.setMaxIdle(5);
 		ds2.setInitialSize(5);
-		ds2.setValidationQuery("SELECT 1");
 		JdbcTemplate template = new JdbcTemplate(ds2);
-		System.out.println(query);
-		ThingNode t;
-		AbstractExtractor<ThingNode> extractor = new AbstractExtractor<ThingNode>(ThingNode.class);
-		template.query(query, extractor);
+		NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(ds2);
+		UniqueIdProvider idProvider = new UniqueIdProvider();
+		idProvider.setJdbcTemplate(template);
+		idProvider.setNamedParameterJdbcTemplate(namedTemplate);
+		String newId = idProvider.getId();
+		Map<String, Object> props = new HashMap<String, Object>();
+		props.put("id", newId);
+		props.put("name", "name to test some shit 1");
+		MapSqlParameterSource paramSource = new MapSqlParameterSource();
+		paramSource.addValue("props", props);
+		namedTemplate.update(query3, paramSource);
+		//paramSource.addValue("ids", Arrays.asList(new String[] {"s1", "s2", "s3"}), Types.ARRAY);
+		//namedTemplate.query(query2, paramSource, extractor);
+		//template.query(query1, extractor, Arrays.asList(new String[] {"s1", "s2"}));
+		//template.query(query1, extractor);
+		//template.query("MATCH (a:System {id: 's1'})-[rr*1..]->(bb) WITH distinct(bb) as b MATCH (b)<-[r]-(c) RETURN c, {relationType: type(r), data: r} as rel, b", extractor);
+		
+		
+		
+		
 		
 	}
+	
 }

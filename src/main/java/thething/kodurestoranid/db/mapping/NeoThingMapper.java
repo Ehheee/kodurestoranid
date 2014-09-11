@@ -64,7 +64,7 @@ public class NeoThingMapper {
 			}
 		}
 		
-		return null;
+		return things;
 		
 	}
 }

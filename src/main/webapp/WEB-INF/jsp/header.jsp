@@ -9,21 +9,4 @@
 <script type="text/javascript" src="<c:url value='/resources/javascript/init.js' />"></script>
 </head>
 <body>
-	<div id="headerContainer">
-		<div id="headerLinks">
-			<c:url value="/objektid" var="ob" />
-			<c:url value="/muugiarved" var="ma" />
-			<c:url value="/ostuarved" var="oa" />
-			<a href="${ob }">Objektid</a> <a href="${ma }">Müügiarved</a> <a href="${oa }">Ostuarved</a>
-
-		</div>
-		<div id="userInfo">
-			<sec:authorize access="isAuthenticated()">
-				Tere, <sec:authentication property="principal.username" /> - <a href="<c:url value='/logout' />">Logi välja</a>
-			</sec:authorize>
-			<sec:authorize access="isAnonymous()">
-				<a href="<c:url value='/login' />">Logi sisse</a>, et lehte kasutada
-			</sec:authorize>
-		</div>
-		<div style="clear: both;"></div>
-	</div>
+	

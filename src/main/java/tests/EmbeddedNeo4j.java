@@ -1,5 +1,6 @@
 package tests;
 import java.io.File;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -26,6 +27,7 @@ public class EmbeddedNeo4j
 	private Log logger = LogFactory.getLog(getClass());
 	private static String insert = "MATCH (n:System:Domain { name: 'kokad' })"+
 			"CREATE (n2:System:Interface:Container { name: 'main view kokkadele', id: '2' }),(n)-[:hasView]->(n2)";
+	private static String insert2 = "CREATE (n:{labels} {props})";
 	private static String select = "MATCH (n:System) RETURN n";
 	private static String selectAll = "MATCH (n)-[r]-() return *";
     private static final String DB_PATH = "c:\\neo4j";
@@ -64,6 +66,12 @@ public class EmbeddedNeo4j
         // START SNIPPET: transaction
         try ( Transaction tx = graphDb.beginTx() )
         {
+        	Map<String, Object> params = new HashMap<String, Object>();
+        	Map<String, Object> props = new HashMap<String, Object>();
+        	props.put("name", "paramsInsertTest");
+        	params.put("props", props);
+        	params.put("labels", "System:Test");
+        	
         	ExecutionResult response = engine.execute(selectAll);
         	Map<String, Object> mapThings = mapper.mapThings(response);
         	

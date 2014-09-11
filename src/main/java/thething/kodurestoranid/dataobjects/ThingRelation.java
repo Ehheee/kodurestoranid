@@ -1,5 +1,6 @@
 package thething.kodurestoranid.dataobjects;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class ThingRelation {
@@ -8,6 +9,11 @@ public class ThingRelation {
 	private Thing from;
 	private Thing to;
 	private Map<String, Object> properties;
+	
+	
+	public ThingRelation(){
+		properties = new HashMap<String, Object>();
+	}
 	
 	public Object getProperty(String name){
 		return properties.get(name);
