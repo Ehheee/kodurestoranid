@@ -15,6 +15,8 @@ public class ThingRelation {
 		properties = new HashMap<String, Object>();
 	}
 	
+	
+	
 	public Object getProperty(String name){
 		return properties.get(name);
 	}

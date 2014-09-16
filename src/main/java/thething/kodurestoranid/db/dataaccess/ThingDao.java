@@ -1,5 +1,6 @@
 package thething.kodurestoranid.db.dataaccess;
 
+import java.util.Collections;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -7,39 +8,93 @@ import javax.sql.DataSource;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 
 import thething.kodurestoranid.dataobjects.Thing;
+import thething.kodurestoranid.db.mapping.NeoResultSetExtractor;
 import thething.kodurestoranid.db.services.TypeDescriptorService;
+import thething.kodurestoranid.db.utils.ThingFilter;
+import thething.kodurestoranid.db.utils.Tools;
 
 public class ThingDao {
 
-	private static final String createQuery = "CREATE (a#replaceLabel &props) ";
+	private static final String createQuery = "CREATE (a#replaceLabel {1}) ";
 	private static final String updateQuery = "";
-	private static final String deleteQuery = "";
+	private static final String deleteQuery = "MATCH (a#replaceLabel {id: {1} }) DELETE a";
 	private static final String getQuery = "MATCH (a#replaceLabel {id: {1} }) RETURN a";
+	private static final String getByLabelQuery = "MATCH (a#replaceLabel ) RETURN a";
 	
-	public void create(Thing thing){
-		String query = createQuery.replaceAll("#replaceLabel", stringFromLabels(thing.getLabels()));
+	NeoResultSetExtractor extractor;
+	
+	public ThingDao(){
+		extractor = new NeoResultSetExtractor();
 	}
+	
+	public String create(Thing thing){
+		String query = createQuery.replace("#replaceLabel", Tools.stringFromLabels(thing.getLabels()));
+		String id = uniqueIdProvider.getId(thing.getLabels().get(0));
+		thing.setProperty("id", id);
+		jdbcTemplate.update(query, thing.getProperties());
+		return id;
+	}
+	
 	
 	public void update(Thing thing){
-		
+		//TODO
 	}
 	
+	
+	
 	public void delete(Thing thing){
-		
+		String query = this.replaceLabel(thing.getLabels(), deleteQuery);
+		jdbcTemplate.update(query, thing.getProperty("id"));
 	}
 	
 	public void get(String id){
-		String query = getQuery.replace("", parseId(id));
+		String query = this.replaceLabel(Collections.<String>emptyList(), typeDescriptorService.getLabelFromId(id));
 		jdbcTemplate.queryForRowSet(query, id);
 	}
 	
-	private String parseId(String id){
-		return typeDescriptorService.getLabelFromId(id);
+	public void getByLabel(String label){
+		String query = getByLabelQuery.replace("#replaceLabel", label);Z
+		jdbcTemplate.query(query, extractor);
 	}
+	
+	
+	public void get(ThingFilter filter){
+		filter.getQuery();
+		MapSqlParameterSource paramSource = new MapSqlParameterSource(filter.getProperties());
+		namedParameterJdbcTemplate.query(filter.getQuery(), paramSource, extractor);
+	}
+	
+	
+	/**
+	 * 
+	 * @param labels
+	 * @param query - query to put labels into
+	 * @return
+	 */
+	private String replaceLabel(List<String> labels, String query){
+		if(labels.isEmpty()){
+			return query.replace("#replaceLabel", "");
+		}else{
+			return query.replace("#replaceLabel", Tools.stringFromLabels(labels));
+		}
+	}
+	
+	
 
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	@Autowired
 	private TypeDescriptorService typeDescriptorService;
 	public TypeDescriptorService getTypeDescriptorService() {
@@ -49,13 +104,18 @@ public class ThingDao {
 		this.typeDescriptorService = typeDescriptorService;
 	}
 
-	private String stringFromLabels(List<String> labels){
-		StringBuilder b = new StringBuilder("");
-		for(String s: labels){
-			b.append(":").append(s);
-		}
-		return b.toString();
+
+	
+	
+	@Autowired
+	UniqueIdProvider uniqueIdProvider;
+	public UniqueIdProvider getUniqueIdProvider() {
+		return uniqueIdProvider;
 	}
+	public void setUniqueIdProvider(UniqueIdProvider uniqueIdProvider) {
+		this.uniqueIdProvider = uniqueIdProvider;
+	}
+
 	
 	@Autowired
 	private BasicDataSource dataSource;

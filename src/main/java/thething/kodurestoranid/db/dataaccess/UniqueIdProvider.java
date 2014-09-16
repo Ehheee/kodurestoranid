@@ -1,5 +1,8 @@
 package thething.kodurestoranid.db.dataaccess;
 
+import javax.sql.DataSource;
+
+import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +36,7 @@ public class UniqueIdProvider {
 	public String getId(String type){
 		MapSqlParameterSource paramSource = new MapSqlParameterSource();
 		paramSource.addValue("name", type);
-		paramSource.addValue("str", type.substring(0, 2));
+		paramSource.addValue("str", type.substring(0, 2).toLowerCase());
 		
 		SqlRowSet rs = jdbcTemplate.queryForRowSet(query, type, type.substring(0, 2));
 		return extractId(rs);
@@ -55,22 +58,12 @@ public class UniqueIdProvider {
 	
 	
 	@Autowired
-	private JdbcTemplate jdbcTemplate;
-	public JdbcTemplate getJdbcTemplate() {
-		return jdbcTemplate;
-	}
-	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
-		this.jdbcTemplate = jdbcTemplate;
-	}
-	
-	
-	@Autowired
-	NamedParameterJdbcTemplate namedParameterJdbcTemplate;
-	public NamedParameterJdbcTemplate getNamedParameterJdbcTemplate() {
-		return namedParameterJdbcTemplate;
-	}
-	public void setNamedParameterJdbcTemplate(
-			NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
-		this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
+	private BasicDataSource dataSource;
+	protected JdbcTemplate jdbcTemplate;
+	protected NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+
+	public void setDataSource(DataSource dataSource) {
+	    this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
+	    this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 }

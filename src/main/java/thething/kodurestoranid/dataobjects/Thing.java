@@ -7,8 +7,8 @@ import java.util.Map;
 
 public class Thing {
 
-	//Map of relations for current String. Relation id used as key.
-	private Map<String, ThingRelation> relations;
+	//Map of relations for current String. Relation type used as key.
+	private Map<String, List<ThingRelation>> relations;
 	//Labels are hierarchical so 0 index is the root and the rest follow in order
 	private List<String> labels;
 	private Map<String, Object> properties;
@@ -17,7 +17,7 @@ public class Thing {
 	public Thing(){
 		properties = new HashMap<String, Object>();
 		labels = new ArrayList<String>();
-		relations = new HashMap<String, ThingRelation>();
+		relations = new HashMap<String, List<ThingRelation>>();
 	}
 	public Object getProperty(String name){
 		return properties.get(name);
@@ -29,10 +29,10 @@ public class Thing {
 	
 	
 	
-	public Map<String, ThingRelation> getRelations() {
+	public Map<String, List<ThingRelation>> getRelations() {
 		return relations;
 	}
-	public void setRelations(Map<String, ThingRelation> relations) {
+	public void setRelations(Map<String, List<ThingRelation>> relations) {
 		this.relations = relations;
 	}
 	public List<String> getLabels() {
