@@ -1,0 +1,6 @@
+kodurestoranid
+==============
+
+Beginning steps in my study into graph databases. This is a start of an attempt to create an application on top of spring and neo4j database that doesn't really have any business logic. I'm currently still working on it, but the idea is that all the business logic and the related view logic would be stored in a graph database. On processing browser requests, the application loads all relevant connected objects from database and parses the data to find system objects. Using those system objects, the application would set up all event listeners and relevant actions. 
+
+Mostly have everything figured out on paper and the most important question that now remains concerns the performance of the application. Unfortunately this would probably only get an answer when I'm nearing completion, but even if the performance is bad initially, this has been an interesting idea for myself to work on and also using graph databases has been easy and a lot of fun. I don't really worry if the project fails to meet the performance of real world applications. I'm still studying and trying to improve and as they say - mistakes are the best way to learn. Without trying it's also not possible to make mistakes to learn from.
