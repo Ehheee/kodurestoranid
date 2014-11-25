@@ -10,6 +10,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
+import org.springframework.stereotype.Component;
 
 /**
  * Class for providing unique ids to neo4j nodes. Ids provided are in string form and also contains the type string for the possible case when
@@ -17,6 +18,7 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
  * @author Kaur
  *
  */
+@Component
 public class UniqueIdProvider {
 
 	private Log logger = LogFactory.getLog(getClass());
@@ -38,6 +40,8 @@ public class UniqueIdProvider {
 		paramSource.addValue("name", type);
 		paramSource.addValue("str", type.substring(0, 2).toLowerCase());
 		
+		logger.info(jdbcTemplate == null);
+		logger.info(type == null + " type");
 		SqlRowSet rs = jdbcTemplate.queryForRowSet(query, type, type.substring(0, 2));
 		return extractId(rs);
 	}
@@ -57,11 +61,12 @@ public class UniqueIdProvider {
 	
 	
 	
-	@Autowired
+	
 	private BasicDataSource dataSource;
 	protected JdbcTemplate jdbcTemplate;
 	protected NamedParameterJdbcTemplate namedParameterJdbcTemplate;
-
+	
+	@Autowired
 	public void setDataSource(DataSource dataSource) {
 	    this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
 	    this.jdbcTemplate = new JdbcTemplate(dataSource);

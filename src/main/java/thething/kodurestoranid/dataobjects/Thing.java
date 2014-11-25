@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 public class Thing {
 
@@ -29,6 +30,7 @@ public class Thing {
 	
 	
 	
+
 	public Map<String, List<ThingRelation>> getRelations() {
 		return relations;
 	}
@@ -52,5 +54,19 @@ public class Thing {
 	}
 
 	
+	
+	public String toString(){
+	StringBuilder sb = new StringBuilder();
+	sb.append("Thing");
+	for(String label: labels){
+		sb.append(":").append(label);
+	}
+	sb.append("{");
+	for(Entry<String, Object> prop: properties.entrySet()){
+		sb.append(prop.getKey()).append(": ").append(prop.getValue()).append(", ");
+	}
+	sb.append("}");
+	return sb.toString();
+	}
 	
 }

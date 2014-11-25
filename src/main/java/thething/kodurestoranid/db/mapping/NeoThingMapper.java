@@ -49,8 +49,8 @@ public class NeoThingMapper {
 				else if(e.getValue() instanceof Relationship){
 					Relationship relationship = (Relationship)e.getValue();
 					ThingRelation relation = new ThingRelation();
-					relation.setName(relationship.getType().name());
-					logger.info(relation.getName());
+					relation.setType(relationship.getType().name());
+					logger.info(relation.getType());
 					for(String key: relationship.getPropertyKeys()){
 						
 						relation.setProperty(key, relationship.getProperty(key));

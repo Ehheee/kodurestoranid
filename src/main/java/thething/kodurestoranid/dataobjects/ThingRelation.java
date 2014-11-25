@@ -2,10 +2,11 @@ package thething.kodurestoranid.dataobjects;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 public class ThingRelation {
 
-	private String name;
+	private String type;
 	private Thing from;
 	private Thing to;
 	private Map<String, Object> properties;
@@ -26,12 +27,16 @@ public class ThingRelation {
 	
 	
 	
-	public String getName() {
-		return name;
+	
+	public String getType() {
+		return type;
 	}
-	public void setName(String name) {
-		this.name = name;
+	public void setType(String type) {
+		this.type = type;
 	}
+
+
+
 	public Thing getFrom() {
 		return from;
 	}
@@ -51,5 +56,16 @@ public class ThingRelation {
 		this.properties = properties;
 	}
 
+	public String toString(){
+		StringBuilder sb = new StringBuilder();
+		sb.append("ThingRelation:").append(type);
+		sb.append("{");
+		for(Entry<String, Object> prop: properties.entrySet()){
+			sb.append(prop.getKey()).append(": ").append(prop.getValue()).append(", ");
+		}
+		sb.append("}");
+		return sb.toString();
+		
+	}
 	
 }

@@ -17,7 +17,7 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
 import thething.kodurestoranid.dataobjects.FieldDescriptor;
 import thething.kodurestoranid.dataobjects.Thing;
 import thething.kodurestoranid.dataobjects.ThingRelation;
-import thething.kodurestoranid.db.dataaccess.ThingDao;
+import thething.kodurestoranid.db.dataaccess.ThingDaoImpl;
 import thething.kodurestoranid.db.dataaccess.UniqueIdProvider;
 import thething.kodurestoranid.db.mapping.NeoResultSetExtractor;
 import thething.kodurestoranid.db.services.TypeDescriptorService;
@@ -29,9 +29,10 @@ public class A1 {
 	private static String query2 = "MATCH (a:System) WHERE a.id IN &ids RETURN a";
 	private static String query3 = "CREATE (n:System:Test &props)";
 	
+	
 	private static NeoResultSetExtractor extractor = new NeoResultSetExtractor();
 	public static void main(String[] args){
-		/*
+		
 		BasicDataSource ds2 = new BasicDataSource();
 		ds2.setDriverClassName("org.neo4j.jdbc.Driver");
 		ds2.setUrl("jdbc:neo4j://localhost:7474/?debug=true");
@@ -44,16 +45,12 @@ public class A1 {
 		
 		TypeDescriptorService typeDescriptorService = new TypeDescriptorService();
 		
-		ThingDao thingDao = new ThingDao();
-		thingDao.setDataSource(ds2);
-		thingDao.setUniqueIdProvider(idProvider);
-		thingDao.setTypeDescriptorService(typeDescriptorService);
-
+		
+		
 		ThingFilter filter = new ThingFilter();
-		filter.setProperty("id", "1");
-		filter.setLabel("System");
-		thingDao.get(filter);
-		*/
+		filter.setLabel("Domain");
+		filter.setProperty("id", "do1");
+		/*
 		Thing type = new Thing();
 		type.setLabels(Arrays.asList(new String[] {"ThingType", "Chef"}));
 		
@@ -84,22 +81,21 @@ public class A1 {
 		
 		TypeDescriptorService service = new TypeDescriptorService();
 		System.out.println(service.descriptorFromThing(type));
-		/*
+		
+		*/
+		
+		
+		
 		JdbcTemplate template = new JdbcTemplate(ds2);
 		NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(ds2);
-		UniqueIdProvider idProvider = new UniqueIdProvider();
-		idProvider.setJdbcTemplate(template);
-		idProvider.setNamedParameterJdbcTemplate(namedTemplate);
+		idProvider.setDataSource(ds2);
 		String newId = idProvider.getId();
 		Map<String, Object> props = new HashMap<String, Object>();
 		props.put("id", newId);
 		props.put("name", "name to test some shit 1");
 		MapSqlParameterSource paramSource = new MapSqlParameterSource();
-		paramSource.addValue("props", props);
-		namedTemplate.update(query3, paramSource);
-		*/
-		//paramSource.addValue("ids", Arrays.asList(new String[] {"s1", "s2", "s3"}), Types.ARRAY);
-		//namedTemplate.query(query2, paramSource, extractor);
+		paramSource.addValue("id", "do1");
+		namedTemplate.query(filter.getQuery(), paramSource, extractor);
 		//template.query(query1, extractor, Arrays.asList(new String[] {"s1", "s2"}));
 		//template.query(query1, extractor);
 		//template.query("MATCH (a:System {id: 's1'})-[rr*1..]->(bb) WITH distinct(bb) as b MATCH (b)<-[r]-(c) RETURN c, {relationType: type(r), data: r} as rel, b", extractor);

@@ -11,6 +11,9 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+
+import thething.kodurestoranid.db.services.TypeDescriptorService;
 
 public  class BaseDao {
 
@@ -22,21 +25,41 @@ public  class BaseDao {
 		THING, USER
 	}
 	
+	
 	@Autowired
+	protected TypeDescriptorService typeDescriptorService;
+	public TypeDescriptorService getTypeDescriptorService() {
+		return typeDescriptorService;
+	}
+	public void setTypeDescriptorService(TypeDescriptorService typeDescriptorService) {
+		this.typeDescriptorService = typeDescriptorService;
+	}
+
+
+	
+	
+	@Autowired
+	UniqueIdProvider uniqueIdProvider;
+	public UniqueIdProvider getUniqueIdProvider() {
+		return uniqueIdProvider;
+	}
+	public void setUniqueIdProvider(UniqueIdProvider uniqueIdProvider) {
+		this.uniqueIdProvider = uniqueIdProvider;
+	}
+
+	
+	
 	private BasicDataSource dataSource;
 	protected JdbcTemplate jdbcTemplate;
 	protected NamedParameterJdbcTemplate namedParameterJdbcTemplate;
-
+	
+	@Autowired
 	public void setDataSource(DataSource dataSource) {
 	    this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
 	    this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 	
-	public void logCollection(Collection<?> collection){
-		for(Object o: collection){
-			logger.info(o);
-		}
-	}
-	
+	@Autowired
+	DataSourceTransactionManager transactionManager;
 	
 }

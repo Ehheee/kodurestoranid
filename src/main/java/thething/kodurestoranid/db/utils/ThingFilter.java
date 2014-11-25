@@ -4,46 +4,67 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 public class ThingFilter {
 
 	private static Integer defaultRelationDepth = 100;
-	List<String> labels;
-	Integer relationDepth;
-	private static String baseQuery = "MATCH (a#replaceLabel {id: &id })-[rr*..#relationDepth]->(bb) WITH distinct(bb) as b MATCH (b)<-[r]-(c) RETURN c, {relationType: type(r), data: r} as rel, b";
+	private List<String> labels;
+	private Integer relationDepth;
+	private static String baseQuery = "MATCH (a#replaceLabel #replaceProperties)-[rr*..#relationDepth]->(bb) WITH distinct(bb) as b MATCH (b)<-[r]-(c) RETURN c, {relationType: type(r), data: r} as rel, b";
 	private Map<String, Object> properties;
 	
-	public ThingFilter(){
+	public ThingFilter() {
 		labels = new ArrayList<String>();
 		properties = new HashMap<String, Object>();
 	}
 	
-	public void setLabel(String label){
-		if(!labels.isEmpty()){
+	public void setLabel(String label){ 
+		if (!labels.isEmpty()) {
 			labels = new ArrayList<String>();
 		}
 		labels.add(label);
 	}
 	
-	public String getQuery(){
-		//Adds an empty label if they are empty for replace to work
-		if(labels.isEmpty()){
-			labels.add("");
+	public ThingFilter addLabel(String label) {
+		labels.add(label);
+		return this;
+	}
+	
+	public String getQuery() {
+		String query = baseQuery;
+		if (labels.isEmpty()) {
+			query = query.replace("#replaceLabel", "");
+		} else {
+			query = query.replace("#replaceLabel", Tools.stringFromLabels(getLabels()));
 		}
-		String query = baseQuery.replace("#replaceLabel", Tools.stringFromLabels(labels));
-		if(relationDepth == null){
+		
+		if (relationDepth == null) {
 			relationDepth = defaultRelationDepth;
 		}
 		query = query.replace("#relationDepth", relationDepth.toString());
+		query = replaceProperties(query);
 		return query;
 	}
 	
+	public String replaceProperties(String query){
+		StringBuilder sb = new StringBuilder();
+		sb.append("{ ");
+		String comma = "";
+		for (Entry<String, Object> e: properties.entrySet()) {
+			sb.append(comma).append(e.getKey()).append(": &").append(e.getKey());
+			comma = ", ";
+		}
+		sb.append(" }");
+		return query.replace("#replaceProperties", sb.toString());
+	}
 	
 	
-	public Object getProperty(String name){
+	
+	public Object getProperty(String name) {
 		return properties.get(name);
 	}
-	public void setProperty(String key, Object value){
+	public void setProperty(String key, Object value) {
 		properties.put(key, value);
 	}
 

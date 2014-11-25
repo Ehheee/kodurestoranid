@@ -13,26 +13,22 @@
     </jdbc:initialize-database>
 	-->
 
-	
-	<!--
-	<bean id="arvedFromDatabase"
-			class="thething.arved.sqldao.ArvedFromDatabase">
-		<property name="dataSource" ref="dataSource" />
-	</bean>
-	-->
-	
+
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+    <property name="dataSource" ref="dataSource"/>
+</bean>
+
 	<bean id="dataSource"
 			class="org.apache.commons.dbcp.BasicDataSource">
-		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
-		<property name="url" value="jdbc:mysql://localhost:3306/kodurestoranid?useUnicode=true&amp;characterEncoding=UTF-8" />
-		<property name="username" value="arved_test2" />
-		<property name="password" value="ZB19Xe8r" />
+		<property name="driverClassName" value="org.neo4j.jdbc.Driver" />
+		<property name="url" value="jdbc:neo4j://localhost:7474/?debug=true" />
 		<property name="initialSize" value="2" />
 		<property name="maxActive" value="5" />
+		<!--
 		<property name="testOnBorrow" value="true" />
 		<property name="validationQuery" value="select 1" />
+		-->
 	</bean>
-       
        
        
 </beans>
