@@ -25,42 +25,64 @@ public class NeoResultSetExtractor implements ResultSetExtractor<NeoResultWrappe
 	private Map<String, Object> rootFilter;
 
 	
-	@SuppressWarnings("unchecked")
 	public NeoResultWrapper extractData(ResultSet rs) throws SQLException,
 			DataAccessException {
 		NeoResultWrapper wrapper = new NeoResultWrapper();
+		boolean rootFound = false;
 		while(rs.next()){
-			final ResultSetMetaData meta = rs.getMetaData();
-			
-			Object column;
-			final int cols = meta.getColumnCount();
-			for (int col=1;col<=cols;col++) {
-	            column = rs.getObject(col);
-				if(column instanceof LinkedHashMap){
-					LinkedHashMap<String, Object> m = (LinkedHashMap<String, Object> )column;
-					if(m.get("labels") != null){
-						Thing thing = createThing(m);
-						
-						wrapper.addThing(thing);
-					}
-					if(m.get("relationType") != null){
-						ThingRelation relation = createRelation(m);
-						wrapper.addRelation(relation);
-					}
-					printMap(m);
+			Thing from = createThing(rs.getObject("c"));
+			Thing to = createThing(rs.getObject("b"));
+			ThingRelation relation = createRelation(rs.getObject("rel"));
+			relation.setFrom(from);
+			relation.setTo(to);
+			from.addRelation(relation);
+			to.addRelation(relation);
+			wrapper.addThing(from);
+			wrapper.addThing(to);
+			wrapper.addRelation(relation);
+			if (!rootFound) {
+				rootFound = checkRoot(from);
+				if (rootFound) {
+					wrapper.setRoot(from);
 				}
-	            
-	        }
-			
+			}
 			
 			
 		}
 		return wrapper;
 	}
 	 
+	private boolean checkRoot(Thing thing) {
+		for (Entry<String, Object> prop: rootFilter.entrySet()) {
+			if (thing.getProperty(prop.getKey()) != null && thing.getProperty(prop.getKey()).equals(prop.getValue())) {
+				continue;
+			} else {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	
+	@SuppressWarnings("unchecked")
+	private Thing createThing(Object object) {
+		if (object instanceof LinkedHashMap) {
+			return createThing((LinkedHashMap<String, Object> )object);
+		}
+		return null;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private ThingRelation createRelation(Object object) {
+		if (object instanceof LinkedHashMap) {
+			return createRelation((LinkedHashMap<String, Object> )object);
+		}
+		return null;
+	}
 
-	
-	
+
+
+
 	@SuppressWarnings("unchecked")
 	private ThingRelation createRelation(LinkedHashMap<String, Object> m) {
 		ThingRelation relation = new ThingRelation();
@@ -75,15 +97,15 @@ public class NeoResultSetExtractor implements ResultSetExtractor<NeoResultWrappe
 	@SuppressWarnings("unchecked")
 	private Thing createThing(LinkedHashMap<String, Object> m) {
 		Thing thing = new Thing();
-		for(Entry<String, Object> entry: m.entrySet()){
-			if(entry.getKey() == "labels"){
-				if(entry.getValue() instanceof ArrayList){
+		for (Entry<String, Object> entry: m.entrySet()) {
+			if (entry.getKey() == "labels" ){
+				if (entry.getValue() instanceof ArrayList) {
 					thing.setLabels((List<String>) entry.getValue());
 				}
 			}
 			
-			if(entry.getKey() == "data"){
-				if(entry.getValue() instanceof LinkedHashMap){
+			if (entry.getKey() == "data") {
+				if (entry.getValue() instanceof LinkedHashMap) {
 					thing.setProperties((Map<String, Object>) entry.getValue());
 				}
 				

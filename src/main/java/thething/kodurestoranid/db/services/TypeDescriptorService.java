@@ -2,9 +2,11 @@ package thething.kodurestoranid.db.services;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -46,11 +48,7 @@ public class TypeDescriptorService {
 		}
 		return descriptions.get(type);
 	}
-	
-	public String getLabelFromId(String id) {
-		return labelsByIdPrefix.get(id.substring(0, 2));
-		
-	}
+
 	
 	public Thing thingFromDescriptor(ThingType thingType) {
 		Thing typeThing = new Thing();
@@ -59,8 +57,8 @@ public class TypeDescriptorService {
 		typeThing.setProperty("typeName", thingType.getTypeName());
 		typeThing.setProperty("id", thingType.getId());
 		
-		Map<String, List<ThingRelation>> thingRelations = new HashMap<>();
-		List<ThingRelation> fieldRelations = new ArrayList<>();
+		Map<String, Set<ThingRelation>> thingRelations = new HashMap<>();
+		Set<ThingRelation> fieldRelations = new HashSet<>();
 		for (Entry<String, FieldDescriptor> e: thingType.getFields().entrySet()) {
 			FieldDescriptor field = e.getValue();
 			Thing fieldThing = new Thing();
@@ -96,7 +94,7 @@ public class TypeDescriptorService {
 			return null;
 		}
 		thingType.setId((String) thing.getProperty("id"));
-		List<ThingRelation> fieldRelations = thing.getRelations().get("hasField");
+		Set<ThingRelation> fieldRelations = thing.getRelations().get("hasField");
 		for (ThingRelation fieldRelation: fieldRelations) {
 			FieldDescriptor field = new FieldDescriptor();
 			Thing fieldThing = fieldRelation.getTo();

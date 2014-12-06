@@ -2,6 +2,7 @@ package thething.kodurestoranid.db.dataaccess;
 
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.sql.DataSource;
 
@@ -42,21 +43,22 @@ public class ThingDaoImpl extends BaseDao implements ThingDao {
 	/**
 	 * Transactional method to wrap around recursive method. Otherwise each recursion would be a new transaction.
 	 * The point is to rollback everything in case of errors.
+	 * @param Thing thing
+	 * @return the root Thing inserted
 	 */
 	public Thing createOrUpdateWithRelations(Thing thing){
-		createOrUpdateWithRelations(thing, 10);
-		return thing;
+		return createOrUpdateWithRelations(thing, 10);
 	}
 	
 	/**
-	 * Attempt to create method for inserting a new Thing while separately also inserting all the related things and relations.
+	 * Attempt to create method for inserting a new @Thing while separately also inserting all the related things and relations.
 	 * It is done recursively
-	 * @param thing
-	 * @return
+	 * @param Thing thing
+	 * @return the root Thing inserted
 	 */
 	public Thing createOrUpdateWithRelations(Thing thing, int depth) {
-		for (Entry<String, List<ThingRelation>> relationsEntry: thing.getRelations().entrySet()) {
-			List<ThingRelation> thingRelations = relationsEntry.getValue();
+		for (Entry<String, Set<ThingRelation>> relationsEntry: thing.getRelations().entrySet()) {
+			Set<ThingRelation> thingRelations = relationsEntry.getValue();
 			for (ThingRelation relation: thingRelations) {
 				createOrUpdateWithRelations(relation.getTo(), depth);
 			}
@@ -64,26 +66,35 @@ public class ThingDaoImpl extends BaseDao implements ThingDao {
 		if (thing.getProperty("id") != null) {
 			update(thing);
 		} else {
-			thing = create(thing);
+			create(thing);
 		}
 		thingRelationDao.createRelations(thing);
-		return null;
+		return thing;
 	}
 	
 	
 
-	
+	/**
+	 * Retrieves id from uniqueIdProvider and inserts thing to database.
+	 * Executes "CREATE (a#replaceLabel &properties)"
+	 * @param thing
+	 * @return inserted Thing that now has an Id.
+	 * 
+	 */
 	public Thing create(Thing thing) {
 		String query = this.replaceLabels(thing.getLabels(), createQuery);
-		String id = uniqueIdProvider.getId(thing.getLabels().get(0));
-		thing.setProperty("id", id);
+		String id = uniqueIdProvider.getId(thing.getLabels());
+		thing.setId(id);
 		MapSqlParameterSource paramSource = new MapSqlParameterSource();
 		paramSource.addValue("properties", thing.getProperties());
 		this.namedParameterJdbcTemplate.update(query, paramSource);
 		return thing;
 	}
 	
-	
+	/**
+	 * Executes "MATCH (a#replaceLabel {id: &id }) SET a = &properties "
+	 * @param Thing thing
+	 */
 	public void update(Thing thing){
 		String query = this.replaceLabels(thing.getLabels(), updateQuery);
 		MapSqlParameterSource paramSource = new MapSqlParameterSource();
@@ -93,11 +104,15 @@ public class ThingDaoImpl extends BaseDao implements ThingDao {
 	}
 	
 	
-	
+	/**
+	 * Executes "MATCH (a#replaceLabel {id: {1} }) DELETE a"
+	 * @param Thing thing
+	 */
 	public void delete(Thing thing){
 		String query = this.replaceLabels(thing.getLabels(), deleteQuery);
 		jdbcTemplate.update(query, thing.getProperty("id"));
 	}
+	
 	
 	public Thing get(String id){
 		ThingFilter filter = new ThingFilter();
@@ -110,8 +125,7 @@ public class ThingDaoImpl extends BaseDao implements ThingDao {
 		MapSqlParameterSource paramSource = new MapSqlParameterSource(filter.getProperties());
 		NeoResultSetExtractor extractor = new NeoResultSetExtractor();
 		extractor.setRootFilter(filter.getProperties());
-		this.namedParameterJdbcTemplate.query(filter.getQuery(), paramSource, extractor);
-		return null;
+		return this.namedParameterJdbcTemplate.query(filter.getQuery(), paramSource, extractor).getRoot();
 	}
 	
 	

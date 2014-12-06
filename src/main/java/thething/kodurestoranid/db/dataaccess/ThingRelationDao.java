@@ -2,6 +2,7 @@ package thething.kodurestoranid.db.dataaccess;
 
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -23,7 +24,7 @@ public class ThingRelationDao extends BaseDao{
 	private static final String deleteRelations = "";
 	
 	public void createRelations(Thing thing) {
-		for (Entry<String, List<ThingRelation>> e: thing.getRelations().entrySet()) {
+		for (Entry<String, Set<ThingRelation>> e: thing.getRelations().entrySet()) {
 			for (ThingRelation relation: e.getValue()) {
 				if (relation.getProperty("id") != null) {
 					

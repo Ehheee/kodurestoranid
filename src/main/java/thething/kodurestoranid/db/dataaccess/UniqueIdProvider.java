@@ -1,5 +1,7 @@
 package thething.kodurestoranid.db.dataaccess;
 
+import java.util.List;
+
 import javax.sql.DataSource;
 
 import org.apache.commons.dbcp.BasicDataSource;
@@ -35,13 +37,28 @@ public class UniqueIdProvider {
 		return extractId(rs);
 	}
 	
+	/**
+	 * Creates id by using a sequence and the first 2 chars of each label.
+	 * @param labels
+	 * @return
+	 */
+	public String getId(List<String> labels){
+		StringBuilder prefix = new StringBuilder();
+		for (String label: labels) {
+			prefix.append(label.substring(0, 2));
+		}
+		String name = labels.get(labels.size()-1);
+		String str = prefix.toString();
+		SqlRowSet rs = jdbcTemplate.queryForRowSet(query, name, str);
+		return extractId(rs);
+	}
+	/**
+	 * Creates id using a sequence and 2 first chars of the provided string.
+	 * Results in the form %s%s%d+
+	 * @param type
+	 * @return
+	 */
 	public String getId(String type){
-		MapSqlParameterSource paramSource = new MapSqlParameterSource();
-		paramSource.addValue("name", type);
-		paramSource.addValue("str", type.substring(0, 2).toLowerCase());
-		
-		logger.info(jdbcTemplate == null);
-		logger.info(type == null + " type");
 		SqlRowSet rs = jdbcTemplate.queryForRowSet(query, type, type.substring(0, 2));
 		return extractId(rs);
 	}

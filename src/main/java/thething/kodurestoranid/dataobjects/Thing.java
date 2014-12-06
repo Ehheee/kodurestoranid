@@ -2,14 +2,16 @@ package thething.kodurestoranid.dataobjects;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 public class Thing {
 
-	//Map of relations for current String. Relation type used as key.
-	private Map<String, List<ThingRelation>> relations;
+	//Things relations mapped by relations type.
+	private Map<String, Set<ThingRelation>> relations;
 	//Labels are hierarchical so 0 index is the root and the rest follow in order
 	private List<String> labels;
 	private Map<String, Object> properties;
@@ -18,7 +20,7 @@ public class Thing {
 	public Thing(){
 		properties = new HashMap<String, Object>();
 		labels = new ArrayList<String>();
-		relations = new HashMap<String, List<ThingRelation>>();
+		relations = new HashMap<String, Set<ThingRelation>>();
 	}
 	public Object getProperty(String name){
 		return properties.get(name);
@@ -27,14 +29,26 @@ public class Thing {
 		properties.put(key, value);
 	}
 	
+	public String getId() {
+		Object id = properties.get("id");
+		if (id == null) {
+			return null;
+		} else {
+			return (String) id;
+		}
+	}
+	
+	public void setId(String id) {
+		properties.put("id", id);
+	}
 	
 	
 	
 
-	public Map<String, List<ThingRelation>> getRelations() {
+	public Map<String, Set<ThingRelation>> getRelations() {
 		return relations;
 	}
-	public void setRelations(Map<String, List<ThingRelation>> relations) {
+	public void setRelations(Map<String, Set<ThingRelation>> relations) {
 		this.relations = relations;
 	}
 	public List<String> getLabels() {
@@ -52,7 +66,13 @@ public class Thing {
 	public void setProperties(Map<String, Object> properties) {
 		this.properties = properties;
 	}
-
+	
+	public void addRelation(ThingRelation relation) {
+		if (relations.get(relation.getType()) == null) {
+			relations.put(relation.getType(), new HashSet<ThingRelation>());
+		}
+		relations.get(relation.getType()).add(relation);
+	}
 	
 	
 	public String toString(){

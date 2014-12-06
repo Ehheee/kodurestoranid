@@ -10,20 +10,19 @@ public class NeoResultWrapper {
 
 	private Map<String, Thing> things;
 	private Map<String, ThingRelation> relations;
-	private String rootId;
+	private Thing root;
 	
 	public NeoResultWrapper(){
 		things = new TreeMap<String, Thing>();
 		relations = new TreeMap<String, ThingRelation>();
 	}
 	
-	
-	
-	public String getRootId() {
-		return rootId;
+
+	public Thing getRoot() {
+		return root;
 	}
-	public void setRootId(String rootId) {
-		this.rootId = rootId;
+	public void setRoot(Thing root) {
+		this.root = root;
 	}
 
 	public void addThing(Thing thing){

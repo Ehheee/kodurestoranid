@@ -5,7 +5,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
+/**
+ * Class to represent a Filter that is used to create a query
+ * for retrieving a Thing and along with it the full tree of Things
+ * related to the root with outgoing relations.
+ * relationDepth can be set in order to limit the levels of the tree.
+ * @author Kaur
+ *
+ */
 public class ThingFilter {
 
 	private static Integer defaultRelationDepth = 100;
@@ -47,7 +54,7 @@ public class ThingFilter {
 		return query;
 	}
 	
-	public String replaceProperties(String query){
+	private String replaceProperties(String query){
 		StringBuilder sb = new StringBuilder();
 		sb.append("{ ");
 		String comma = "";
