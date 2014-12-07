@@ -18,7 +18,7 @@ public class ThingFilter {
 	private static Integer defaultRelationDepth = 100;
 	private List<String> labels;
 	private Integer relationDepth;
-	private static String baseQuery = "MATCH (a#replaceLabel #replaceProperties)-[rr*..#relationDepth]->(bb) WITH distinct(bb) as b MATCH (b)<-[r]-(c) RETURN c, {relationType: type(r), data: r} as rel, b";
+	private static String baseQuery = "MATCH (a#replaceLabel #replaceProperties)-[rr*..#relationDepth]->(bb) WITH distinct(bb) as b MATCH (b)<-[r]-(c) RETURN {labels: labels(c), data: c} as from, {relationType: type(r), data: r} as rel, {labels: labels(b), data: b} as to";
 	private Map<String, Object> properties;
 	
 	public ThingFilter() {

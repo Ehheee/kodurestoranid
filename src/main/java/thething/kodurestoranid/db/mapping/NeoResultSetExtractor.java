@@ -30,8 +30,8 @@ public class NeoResultSetExtractor implements ResultSetExtractor<NeoResultWrappe
 		NeoResultWrapper wrapper = new NeoResultWrapper();
 		boolean rootFound = false;
 		while(rs.next()){
-			Thing from = createThing(rs.getObject("c"));
-			Thing to = createThing(rs.getObject("b"));
+			Thing from = createThing(rs.getObject("from"));
+			Thing to = createThing(rs.getObject("to"));
 			ThingRelation relation = createRelation(rs.getObject("rel"));
 			relation.setFrom(from);
 			relation.setTo(to);
