@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class ThingRelation {
 
 	private String type;
@@ -36,7 +38,7 @@ public class ThingRelation {
 	}
 
 
-
+	@JsonIgnore
 	public Thing getFrom() {
 		return from;
 	}
