@@ -19,7 +19,7 @@
        http://www.springframework.org/schema/data/neo4j/spring-neo4j.xsd
        ">
 	<context:annotation-config />
-	<context:component-scan base-package="thething.kodurestoranid" />
+	<context:component-scan base-package="thething" />
 	<mvc:annotation-driven />
 	<tx:annotation-driven />
 	<mvc:resources mapping="/resources/**" location="/resources/" />

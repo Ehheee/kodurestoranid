@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.JsonNode;
@@ -40,6 +42,14 @@ public class BaseController {
 		}
 		sb.append(" }");
 		return sb.toString();
+	}
+	
+	protected void sendError(HttpServletResponse response, int error) {
+		try {
+			response.sendError(error);
+		} catch (IOException e) {
+			logger.warn(e);
+		}
 	}
 	
 	/*

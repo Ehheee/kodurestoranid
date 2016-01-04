@@ -1,17 +1,16 @@
 package thething.kodurestoranid.db.dataaccess;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import javax.sql.DataSource;
-
-import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.neo4j.ogm.session.Session;
+import org.neo4j.ogm.session.result.Result;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
+import org.springframework.data.neo4j.template.Neo4jOperations;
 import org.springframework.stereotype.Component;
 
 /**
@@ -25,7 +24,7 @@ public class UniqueIdProvider {
 
 	private Log logger = LogFactory.getLog(getClass());
 	
-	private static String query = "MERGE (id:UniqueId {name: {1}, str: {2} }) "
+	private static String query = "MERGE (id:UniqueId {name: {name}, str: {str} }) "
 								+"ON CREATE SET id.count = 1 "
 								+"ON MATCH SET id.count = id.count + 1 "
 								+"RETURN id.str + id.count AS uid ";
@@ -33,8 +32,8 @@ public class UniqueIdProvider {
 	
 	
 	public String getId(){
-		SqlRowSet rs =jdbcTemplate.queryForRowSet(query, "System", "s");
-		return extractId(rs);
+		//SqlRowSet rs =jdbcTemplate.queryForRowSet(query, "System", "s");
+		return null;// extractId(rs);
 	}
 	
 	/**
@@ -49,8 +48,19 @@ public class UniqueIdProvider {
 		}
 		String name = labels.get(labels.size()-1);
 		String str = prefix.toString();
-		SqlRowSet rs = jdbcTemplate.queryForRowSet(query, name, str);
-		return extractId(rs);
+		Map<String, Object> params = new HashMap<>();
+		params.put("name", name);
+		params.put("str", str);
+		List<Object> par = new ArrayList<>();
+		par.add(name);
+		par.add(str);
+		Result r = this.neo4jOperations.query(query, params);
+		while (r.iterator().hasNext()) {
+			System.out.println(r.iterator().next());
+		}
+		logger.info(r);
+		//SqlRowSet rs = jdbcTemplate.queryForRowSet(query, name, str);
+		return extractId(r);
 	}
 	/**
 	 * Creates id using a sequence and 2 first chars of the provided string.
@@ -59,12 +69,13 @@ public class UniqueIdProvider {
 	 * @return
 	 */
 	public String getId(String type){
-		SqlRowSet rs = jdbcTemplate.queryForRowSet(query, type, type.substring(0, 2));
-		return extractId(rs);
+		//SqlRowSet rs = jdbcTemplate.queryForRowSet(query, type, type.substring(0, 2));
+		return null;//extractId(rs);
 	}
 	
 	
-	private String extractId(SqlRowSet rs){
+	private String extractId(Result rs){
+		/*
 		while(rs.next()){
 			Object o = rs.getObject("uid");
 			if(o instanceof String){
@@ -72,6 +83,7 @@ public class UniqueIdProvider {
 			}
 			
 		}
+		*/
 		return null;
 	}
 	
@@ -79,13 +91,16 @@ public class UniqueIdProvider {
 	
 	
 	
-	private BasicDataSource dataSource;
-	protected JdbcTemplate jdbcTemplate;
-	protected NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+	private Neo4jOperations neo4jOperations;
+	private Session session;
 	
 	@Autowired
-	public void setDataSource(DataSource dataSource) {
-	    this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-	    this.jdbcTemplate = new JdbcTemplate(dataSource);
+	public void setSession(Session session) {
+
+	}
+	
+	@Autowired
+	public void setNeo4jOperations(Neo4jOperations neo4jOperations) {
+		this.neo4jOperations = neo4jOperations;
 	}
 }

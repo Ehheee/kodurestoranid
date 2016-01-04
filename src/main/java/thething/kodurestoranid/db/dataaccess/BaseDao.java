@@ -48,7 +48,7 @@ public  class BaseDao {
 	}
 
 	
-	
+	/*
 	private BasicDataSource dataSource;
 	protected JdbcTemplate jdbcTemplate;
 	protected NamedParameterJdbcTemplate namedParameterJdbcTemplate;
@@ -61,5 +61,5 @@ public  class BaseDao {
 	
 	@Autowired
 	DataSourceTransactionManager transactionManager;
-	
+	*/
 }

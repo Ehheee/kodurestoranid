@@ -1,6 +1,7 @@
 package thething.kodurestoranid.web.admin;
 
 import java.io.IOException;
+import java.util.Enumeration;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -22,7 +23,7 @@ import thething.kodurestoranid.web.BaseController;
 
 @Controller
 @RequestMapping("/admin")
-public class AdminController extends BaseController{
+public class AdminController extends BaseController {
 
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
 	public void createThing(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -32,17 +33,61 @@ public class AdminController extends BaseController{
 		response.getWriter().write("it works");
 	}
 	
+
 	@ResponseBody
-	@RequestMapping(value = "/get/{id}", method = RequestMethod.GET)
-	public Thing getThing(@PathVariable("id") String id) throws JsonGenerationException, JsonMappingException, IOException {
+	@RequestMapping(value = "/get/json/label/{label}", method = RequestMethod.GET)
+	public Object getJsonByLabel(@PathVariable("label") String label,
+								HttpServletRequest request, 
+								HttpServletResponse response) {
 		ThingFilter filter = new ThingFilter();
-		filter.setProperty("id", id);
-		Thing thing = thingDao.getByFilter(filter);
-		logger.info(thing);
-		return thing;
+		filter.setLabel(label);
+		return processJsonRequest(request, response, filter);
 	}
 	
+	@ResponseBody
+	@RequestMapping(value = "/get/json/{property}/{value}", method = RequestMethod.GET)
+	public Object getJsonById(@PathVariable("property") String property, 
+							@PathVariable("value") String value,
+							HttpServletRequest request, 
+							HttpServletResponse response) {
+		ThingFilter filter = new ThingFilter();
+		filter.setProperty(property, value);
+		return processJsonRequest(request, response, filter);
+		
+	}
 	
+	private Object processJsonRequest(HttpServletRequest request, HttpServletResponse response, ThingFilter filter) {
+		Enumeration<String> names = request.getHeaderNames();
+		String responseFormat = request.getParameter("responseFormat");
+		if (responseFormat == null) {
+			responseFormat = "thing";
+		}
+		Object responseObject = null;
+		switch (responseFormat) {
+		case "cyto" :
+			responseObject = thingDao.getCytoWrapperByFilter(filter);
+			break;
+		case "resultWrapper" :
+			responseObject = thingDao.getResultsByFilter(filter);
+			break;
+		case "thing" :
+			responseObject = thingDao.getThingByFilter(filter);
+			break;
+			
+		default :
+			logger.warn("Illegal responseFormat queried");
+			this.sendError(response, HttpServletResponse.SC_NOT_ACCEPTABLE);
+		}
+		return responseObject;
+	}
+	private void writeThing(HttpServletResponse response, Thing thing) {
+		try {
+			logger.info(mapper.writeValueAsString(thing));
+			mapper.writeValue(response.getOutputStream(), thing);
+		} catch (IOException e) {
+			logger.error(e);
+		}
+	}
 	
 	private ThingType requestToType(HttpServletRequest servletRequest ) {
 		RequestWrapper request = new RequestWrapper(servletRequest);

@@ -55,15 +55,19 @@ public class ThingFilter {
 	}
 	
 	private String replaceProperties(String query){
-		StringBuilder sb = new StringBuilder();
-		sb.append("{ ");
-		String comma = "";
-		for (Entry<String, Object> e: properties.entrySet()) {
-			sb.append(comma).append(e.getKey()).append(": &").append(e.getKey());
-			comma = ", ";
+		if (properties.size() > 0) {
+			StringBuilder sb = new StringBuilder();
+			sb.append("{ ");
+			String comma = "";
+			for (Entry<String, Object> e: properties.entrySet()) {
+				sb.append(comma).append(e.getKey()).append(": &").append(e.getKey());
+				comma = ", ";
+			}
+			sb.append(" }");
+			return query.replace("#replaceProperties", sb.toString());
+		} else {
+			return query.replace("#replaceProperties", "");
 		}
-		sb.append(" }");
-		return query.replace("#replaceProperties", sb.toString());
 	}
 	
 	
@@ -75,8 +79,6 @@ public class ThingFilter {
 		properties.put(key, value);
 	}
 
-	
-	
 	public List<String> getLabels() {
 		return labels;
 	}
@@ -84,8 +86,6 @@ public class ThingFilter {
 		this.labels = labels;
 	}
 
-	
-	
 	public Integer getRelationDepth() {
 		return relationDepth;
 	}
@@ -93,8 +93,6 @@ public class ThingFilter {
 		this.relationDepth = relationDepth;
 	}
 
-	
-	
 	public Map<String, Object> getProperties() {
 		return properties;
 	}

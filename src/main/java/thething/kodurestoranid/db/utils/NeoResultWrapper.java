@@ -6,9 +6,16 @@ import java.util.TreeMap;
 import thething.kodurestoranid.dataobjects.Thing;
 import thething.kodurestoranid.dataobjects.ThingRelation;
 
+/**
+ * Wrap database results in a nice wrapper so it would be possible to get objects by id
+ * @author Kaur
+ *
+ */
 public class NeoResultWrapper {
 
+	//Things mapped by id
 	private Map<String, Thing> things;
+	//Relations mapped by id
 	private Map<String, ThingRelation> relations;
 	private Thing root;
 	
@@ -25,11 +32,22 @@ public class NeoResultWrapper {
 		this.root = root;
 	}
 
-	public void addThing(Thing thing){
-		things.put((String)thing.getProperty("id"), thing);
+	public Thing addThing(Thing thing){
+		if (!things.containsKey(thing.getId())) {
+			things.put(thing.getId(), thing);
+			return thing;
+		} else {
+			return things.get(thing.getId());
+		}
+		
 	}
-	public void addRelation(ThingRelation relation){
-		relations.put((String)relation.getProperty("id"), relation);
+	public ThingRelation addRelation(ThingRelation relation){
+		if (!relations.containsKey(relation.getId())) {
+			relations.put(relation.getId(), relation);
+			return relation;
+		} else {
+			return relations.get(relation.getId());
+		}
 	}
 	
 	public Map<String, Thing> getThings() {

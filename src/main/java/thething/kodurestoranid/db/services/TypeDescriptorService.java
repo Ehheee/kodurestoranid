@@ -41,7 +41,7 @@ public class TypeDescriptorService {
 			ThingFilter filter = new ThingFilter();
 			filter.addLabel("System").addLabel("ThingType");
 			filter.setProperty("typeName", type);
-			Thing thing = thingDao.getByFilter(filter);
+			Thing thing = thingDao.getThingByFilter(filter);
 			if (thing != null) {
 				descriptions.put(type, this.descriptorFromThing(thing));
 			}
@@ -79,7 +79,7 @@ public class TypeDescriptorService {
 			fieldRelations.add(relation);
 		}
 		thingRelations.put("hasField", fieldRelations);
-		typeThing.setRelations(thingRelations);
+		typeThing.setRelationsOutgoing(thingRelations);
 		return typeThing;
 		
 	}
@@ -94,7 +94,7 @@ public class TypeDescriptorService {
 			return null;
 		}
 		thingType.setId((String) thing.getProperty("id"));
-		Set<ThingRelation> fieldRelations = thing.getRelations().get("hasField");
+		Set<ThingRelation> fieldRelations = thing.getRelationsOutgoing().get("hasField");
 		for (ThingRelation fieldRelation: fieldRelations) {
 			FieldDescriptor field = new FieldDescriptor();
 			Thing fieldThing = fieldRelation.getTo();

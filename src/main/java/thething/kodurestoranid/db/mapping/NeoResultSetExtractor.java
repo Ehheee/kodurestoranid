@@ -32,12 +32,12 @@ public class NeoResultSetExtractor implements ResultSetExtractor<NeoResultWrappe
 			Thing from = createThing(rs.getObject("from"));
 			Thing to = createThing(rs.getObject("to"));
 			ThingRelation relation = createRelation(rs.getObject("rel"));
+			from = wrapper.addThing(from);
+			to = wrapper.addThing(to);
 			relation.setFrom(from);
 			relation.setTo(to);
 			from.addRelation(relation);
 			to.addRelation(relation);
-			wrapper.addThing(from);
-			wrapper.addThing(to);
 			wrapper.addRelation(relation);
 			if (!rootFound) {
 				rootFound = checkRoot(from);

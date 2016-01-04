@@ -27,7 +27,18 @@ public class ThingRelation {
 		properties.put(key, value);
 	}
 	
+	public String getId() {
+		Object id = properties.get("id");
+		if (id == null) {
+			return null;
+		} else {
+			return (String) id;
+		}
+	}
 	
+	public void setId(String id) {
+		properties.put("id", id);
+	}
 	
 	
 	public String getType() {
@@ -69,5 +80,53 @@ public class ThingRelation {
 		return sb.toString();
 		
 	}
+
+
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((properties == null) ? 0 : properties.hashCode());
+		result = prime * result + ((type == null) ? 0 : type.hashCode());
+		return result;
+	}
+
+
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		ThingRelation other = (ThingRelation) obj;
+		if (properties == null) {
+			if (other.properties != null) {
+				return false;
+			}
+		} else if (!properties.equals(other.properties)) {
+			return false;
+		}
+		if (type == null) {
+			if (other.type != null) {
+				return false;
+			}
+		} else if (!type.equals(other.type)) {
+			return false;
+		}
+		return true;
+	}
+
+
+
+	
+	
 	
 }

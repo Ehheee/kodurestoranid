@@ -24,6 +24,6 @@ public class A3 {
 		filter.setProperty("id", "Sy3");
 		System.out.println(filter.getQuery());
 		
-		thingDao.getByFilter(filter);
+		thingDao.getThingByFilter(filter);
 	}
 }

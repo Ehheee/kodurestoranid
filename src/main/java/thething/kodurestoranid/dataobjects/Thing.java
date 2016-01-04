@@ -8,10 +8,20 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+/**
+ * Class to represent a random thing.
+ * It can have any kinds of properties having any kinds of values.
+ * It can have any kinds of incoming and outgoing relations to other things.
+ * 
+ * @author Kaur
+ *
+ */
 public class Thing {
 
-	//Things relations mapped by relations type.
-	private Map<String, Set<ThingRelation>> relations;
+	//Incoming and outgoing relations mapped by relation type.
+	private Map<String, Set<ThingRelation>> relationsIncoming;
+	private Map<String, Set<ThingRelation>> relationsOutgoing;
 	//Labels are hierarchical so 0 index is the root and the rest follow in order
 	private List<String> labels;
 	private Map<String, Object> properties;
@@ -20,7 +30,8 @@ public class Thing {
 	public Thing(){
 		properties = new HashMap<String, Object>();
 		labels = new ArrayList<String>();
-		relations = new HashMap<String, Set<ThingRelation>>();
+		relationsIncoming = new HashMap<String, Set<ThingRelation>>();
+		relationsOutgoing = new HashMap<String, Set<ThingRelation>>();
 	}
 	public Object getProperty(String name){
 		return properties.get(name);
@@ -42,14 +53,19 @@ public class Thing {
 		properties.put("id", id);
 	}
 	
-	
-	
-
-	public Map<String, Set<ThingRelation>> getRelations() {
-		return relations;
+	@JsonIgnore
+	public Map<String, Set<ThingRelation>> getRelationsIncoming() {
+		return relationsIncoming;
 	}
-	public void setRelations(Map<String, Set<ThingRelation>> relations) {
-		this.relations = relations;
+	public void setRelationsIncoming(Map<String, Set<ThingRelation>> relationsIncoming) {
+		this.relationsIncoming = relationsIncoming;
+	}
+
+	public Map<String, Set<ThingRelation>> getRelationsOutgoing() {
+		return relationsOutgoing;
+	}
+	public void setRelationsOutgoing(Map<String, Set<ThingRelation>> relationsOutgoing) {
+		this.relationsOutgoing = relationsOutgoing;
 	}
 	public List<String> getLabels() {
 		return labels;
@@ -68,25 +84,57 @@ public class Thing {
 	}
 	
 	public void addRelation(ThingRelation relation) {
-		if (relations.get(relation.getType()) == null) {
-			relations.put(relation.getType(), new HashSet<ThingRelation>());
+		if (relation.getFrom().equals(this)) {
+			if (!relationsOutgoing.containsKey(relation.getType())) {
+				relationsOutgoing.put(relation.getType(), new HashSet<ThingRelation>());
+			}
+			relationsOutgoing.get(relation.getType()).add(relation);
+		} else if (relation.getTo().equals(this)) {
+			if (!relationsIncoming.containsKey(relation.getType())) {
+				relationsIncoming.put(relation.getType(), new HashSet<ThingRelation>());
+			}
+			relationsIncoming.get(relation.getType()).add(relation);
 		}
-		relations.get(relation.getType()).add(relation);
+			
+		
+	}
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((labels == null) ? 0 : labels.hashCode());
+		result = prime * result
+				+ ((properties == null) ? 0 : properties.hashCode());
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		Thing other = (Thing) obj;
+		if (labels == null) {
+			if (other.labels != null) {
+				return false;
+			}
+		} else if (!labels.equals(other.labels)) {
+			return false;
+		}
+		if (properties == null) {
+			if (other.properties != null) {
+				return false;
+			}
+		} else if (!properties.equals(other.properties)) {
+			return false;
+		}
+		return true;
 	}
 	
-	
-	public String toString(){
-	StringBuilder sb = new StringBuilder();
-	sb.append("Thing");
-	for(String label: labels){
-		sb.append(":").append(label);
-	}
-	sb.append("{");
-	for(Entry<String, Object> prop: properties.entrySet()){
-		sb.append(prop.getKey()).append(": ").append(prop.getValue()).append(", ");
-	}
-	sb.append("}");
-	return sb.toString();
-	}
 	
 }

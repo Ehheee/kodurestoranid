@@ -1,26 +1,25 @@
 package thething.kodurestoranid.db.dataaccess;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.sql.DataSource;
-
-import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.neo4j.ogm.session.result.Result;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.data.neo4j.template.Neo4jOperations;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.stereotype.Component;
 
+import thething.kodurestoranid.cyto.dataobjects.CytoNode;
+import thething.kodurestoranid.cyto.dataobjects.CytoWrapper;
 import thething.kodurestoranid.dataobjects.Thing;
 import thething.kodurestoranid.dataobjects.ThingRelation;
 import thething.kodurestoranid.db.mapping.NeoResultSetExtractor;
-import thething.kodurestoranid.db.services.TypeDescriptorService;
+import thething.kodurestoranid.db.utils.NeoResultWrapper;
 import thething.kodurestoranid.db.utils.ThingFilter;
 import thething.kodurestoranid.db.utils.Tools;
 
@@ -57,7 +56,7 @@ public class ThingDaoImpl extends BaseDao implements ThingDao {
 	 * @return the root Thing inserted
 	 */
 	public Thing createOrUpdateWithRelations(Thing thing, int depth) {
-		for (Entry<String, Set<ThingRelation>> relationsEntry: thing.getRelations().entrySet()) {
+		for (Entry<String, Set<ThingRelation>> relationsEntry: thing.getRelationsOutgoing().entrySet()) {
 			Set<ThingRelation> thingRelations = relationsEntry.getValue();
 			for (ThingRelation relation: thingRelations) {
 				createOrUpdateWithRelations(relation.getTo(), depth);
@@ -85,9 +84,13 @@ public class ThingDaoImpl extends BaseDao implements ThingDao {
 		String query = this.replaceLabels(thing.getLabels(), createQuery);
 		String id = uniqueIdProvider.getId(thing.getLabels());
 		thing.setId(id);
-		MapSqlParameterSource paramSource = new MapSqlParameterSource();
-		paramSource.addValue("properties", thing.getProperties());
-		this.namedParameterJdbcTemplate.update(query, paramSource);
+		//MapSqlParameterSource paramSource = new MapSqlParameterSource();
+		//paramSource.addValue("properties", thing.getProperties());
+		Map<String, Map<String, Object>> params = new HashMap<String, Map<String, Object>>();
+		params.put("properties", thing.getProperties());
+		Result r = this.neo4jOperations.query(query, params);
+		logger.info(r.toString());
+		//this.namedParameterJdbcTemplate.update(query, paramSource);
 		return thing;
 	}
 	
@@ -95,12 +98,12 @@ public class ThingDaoImpl extends BaseDao implements ThingDao {
 	 * Executes "MATCH (a#replaceLabel {id: &id }) SET a = &properties "
 	 * @param Thing thing
 	 */
-	public void update(Thing thing){
+	public void update(Thing thing) {
 		String query = this.replaceLabels(thing.getLabels(), updateQuery);
 		MapSqlParameterSource paramSource = new MapSqlParameterSource();
 		paramSource.addValue("properties", thing.getProperties());
 		paramSource.addValue("id", thing.getProperty("id"));
-		this.namedParameterJdbcTemplate.update(query, paramSource);
+		//this.namedParameterJdbcTemplate.update(query, paramSource);
 	}
 	
 	
@@ -108,24 +111,59 @@ public class ThingDaoImpl extends BaseDao implements ThingDao {
 	 * Executes "MATCH (a#replaceLabel {id: {1} }) DELETE a"
 	 * @param Thing thing
 	 */
-	public void delete(Thing thing){
+	public void delete(Thing thing) {
 		String query = this.replaceLabels(thing.getLabels(), deleteQuery);
-		jdbcTemplate.update(query, thing.getProperty("id"));
+		//jdbcTemplate.update(query, thing.getProperty("id"));
 	}
 	
 	
-	public Thing get(String id){
+	public Thing get(String id) {
 		ThingFilter filter = new ThingFilter();
 		filter.setProperty("id", id);
-		return getByFilter(filter);
+		return getThingByFilter(filter);
 	}
 
 	
-	public Thing getByFilter(ThingFilter filter){
+	/**
+	 * Returns the results by the root thing
+	 */
+	public Thing getThingByFilter(ThingFilter filter) {
+		return this.getResultsByFilter(filter).getRoot();
+	}
+	
+	
+	/**
+	 * Returns results in resultwrapper for easy access by id
+	 * 
+	 */
+	public NeoResultWrapper getResultsByFilter(ThingFilter filter) {
 		MapSqlParameterSource paramSource = new MapSqlParameterSource(filter.getProperties());
 		NeoResultSetExtractor extractor = new NeoResultSetExtractor();
 		extractor.setRootFilter(filter.getProperties());
-		return this.namedParameterJdbcTemplate.query(filter.getQuery(), paramSource, extractor).getRoot();
+		return null;// this.namedParameterJdbcTemplate.query(filter.getQuery(), paramSource, extractor);
+	}
+	
+	/**
+	 * Retruns results as CytoWrapper for network graphs
+	 * @param filter
+	 * @return
+	 */
+	public CytoWrapper getCytoWrapperByFilter(ThingFilter filter) {
+		NeoResultWrapper resultWrapper = this.getResultsByFilter(filter);
+		CytoWrapper cytoWrapper = new CytoWrapper();
+		for (Thing thing: resultWrapper.getThings().values()) {
+			CytoNode node = new CytoNode();
+			node.getData().putAll(thing.getProperties());
+			cytoWrapper.getNodes().add(node);
+		}
+		for (ThingRelation relation: resultWrapper.getRelations().values()) {
+			CytoNode node = new CytoNode();
+			node.getData().putAll(relation.getProperties());
+			node.setSource(relation.getFrom().getId());
+			node.setTarget(relation.getTo().getId());
+			cytoWrapper.getEdges().add(node);
+		}
+		return cytoWrapper;
 	}
 	
 	
@@ -135,7 +173,7 @@ public class ThingDaoImpl extends BaseDao implements ThingDao {
 	 * @param query - query to put labels into
 	 * @return
 	 */
-	private String replaceLabels(List<String> labels, String query){
+	private String replaceLabels(List<String> labels, String query) {
 		if(labels.isEmpty()){
 			return query.replace("#replaceLabel", "");
 		}else{
@@ -144,7 +182,7 @@ public class ThingDaoImpl extends BaseDao implements ThingDao {
 	}
 	
 	
-	private String replaceLabel(String label, String query){
+	private String replaceLabel(String label, String query) {
 		if(label == null){
 			return query.replace("#replaceLabel", "");
 		}else{
@@ -155,5 +193,6 @@ public class ThingDaoImpl extends BaseDao implements ThingDao {
 	
 	@Autowired
 	private ThingRelationDao thingRelationDao;
-	
+	@Autowired
+	private Neo4jOperations neo4jOperations;
 }
