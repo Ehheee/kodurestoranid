@@ -5,8 +5,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
+
+import thething.utils.Tools;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 /**
@@ -24,11 +27,11 @@ public class Thing {
 	private Map<String, Set<ThingRelation>> relationsOutgoing;
 	//Labels are hierarchical so 0 index is the root and the rest follow in order
 	private List<String> labels;
-	private Map<String, Object> properties;
+	private SortedMap<String, Object> properties;
 
 	
 	public Thing(){
-		properties = new HashMap<String, Object>();
+		properties = new TreeMap<String, Object>();
 		labels = new ArrayList<String>();
 		relationsIncoming = new HashMap<String, Set<ThingRelation>>();
 		relationsOutgoing = new HashMap<String, Set<ThingRelation>>();
@@ -76,10 +79,10 @@ public class Thing {
 	public void addLabel(String label){
 		this.labels.add(label);
 	}
-	public Map<String, Object> getProperties() {
+	public SortedMap<String, Object> getProperties() {
 		return properties;
 	}
-	public void setProperties(Map<String, Object> properties) {
+	public void setProperties(SortedMap<String, Object> properties) {
 		this.properties = properties;
 	}
 	
@@ -136,5 +139,8 @@ public class Thing {
 		return true;
 	}
 	
+	public String toString() {
+		return Tools.mapToString(getProperties());
+	}
 	
 }

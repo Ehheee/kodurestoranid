@@ -20,7 +20,7 @@ import thething.kodurestoranid.dataobjects.ThingType;
 import thething.kodurestoranid.db.dataaccess.ThingDao;
 import thething.kodurestoranid.db.dataaccess.ThingDaoImpl;
 import thething.kodurestoranid.db.utils.ThingFilter;
-import thething.kodurestoranid.db.utils.Tools;
+import thething.utils.Tools;
 
 @Component
 public class TypeDescriptorService {

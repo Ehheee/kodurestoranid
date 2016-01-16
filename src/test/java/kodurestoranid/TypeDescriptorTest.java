@@ -34,6 +34,7 @@ public class TypeDescriptorTest {
 		
 		TypeDescriptorService service = new TypeDescriptorService();
 		Thing thing = service.thingFromDescriptor(thingType);
+		System.out.println(thing);
 		ThingType typeDesc2 = service.descriptorFromThing(thing);
 		System.out.println(thingType);
 		System.out.println(typeDesc2);

@@ -1,10 +1,11 @@
-package thething.kodurestoranid.db.utils;
+package thething.utils;
 
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
 
 public class Tools {
 
@@ -28,5 +29,15 @@ public class Tools {
 	
 	public static Class<?> stringToClass(String s){
 		return classes.get(s);
+	}
+	public static String mapToString(SortedMap<String, Object> map) {
+		StringBuilder sb = new StringBuilder("Thing: {");
+		String comma = "";
+		for (String s: map.keySet()) {
+			sb.append(comma).append(s).append(": ").append(map.get(s));
+			comma = ", ";
+		}
+		sb.append("}");
+		return sb.toString();
 	}
 }

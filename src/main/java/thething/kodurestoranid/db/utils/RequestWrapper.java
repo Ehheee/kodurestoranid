@@ -2,6 +2,8 @@ package thething.kodurestoranid.db.utils;
 
 import javax.servlet.http.HttpServletRequest;
 
+import thething.utils.Tools;
+
 public class RequestWrapper {
 
 	private HttpServletRequest request;

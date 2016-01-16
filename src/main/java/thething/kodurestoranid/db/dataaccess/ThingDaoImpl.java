@@ -14,28 +14,29 @@ import org.springframework.data.neo4j.template.Neo4jOperations;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Component;
 
+import thething.exceptions.DatabaseException;
 import thething.kodurestoranid.cyto.dataobjects.CytoNode;
 import thething.kodurestoranid.cyto.dataobjects.CytoWrapper;
 import thething.kodurestoranid.dataobjects.Thing;
 import thething.kodurestoranid.dataobjects.ThingRelation;
-import thething.kodurestoranid.db.mapping.NeoResultSetExtractor;
+import thething.kodurestoranid.db.mapping.NeoResultExtractor;
 import thething.kodurestoranid.db.utils.NeoResultWrapper;
 import thething.kodurestoranid.db.utils.ThingFilter;
-import thething.kodurestoranid.db.utils.Tools;
+import thething.utils.Tools;
 
 @Component
 public class ThingDaoImpl extends BaseDao implements ThingDao {
 
 	private Log logger = LogFactory.getLog(getClass());
 	
-	private static final String createQuery = "CREATE (a#replaceLabel &properties) ";
-	private static final String updateQuery = "MATCH (a#replaceLabel {id: &id }) SET a = &properties ";
-	private static final String deleteQuery = "MATCH (a#replaceLabel {id: {1} }) DELETE a";
-	private static final String getQuery = "MATCH (a#replaceLabel {id: {1} }) RETURN {labels: labels(a), data: a} as node";
+	private static final String createQuery = "CREATE (a#replaceLabel {properties}) ";
+	private static final String updateQuery = "MATCH (a#replaceLabel {id: {id} }) SET a = {properties} ";
+	private static final String deleteQuery = "MATCH (a#replaceLabel {id: {id} }) DELETE a";
+	private static final String getQuery = "MATCH (a#replaceLabel {id: {id} }) RETURN {labels: labels(a), data: a} as node";
 	private static final String getByLabelQuery = "MATCH (a#replaceLabel ) RETURN a";
 	
 	
-	public ThingDaoImpl(){
+	public ThingDaoImpl() {
 	}
 	
 	
@@ -44,8 +45,9 @@ public class ThingDaoImpl extends BaseDao implements ThingDao {
 	 * The point is to rollback everything in case of errors.
 	 * @param Thing thing
 	 * @return the root Thing inserted
+	 * @throws DatabaseException 
 	 */
-	public Thing createOrUpdateWithRelations(Thing thing){
+	public Thing createOrUpdateWithRelations(Thing thing) throws DatabaseException {
 		return createOrUpdateWithRelations(thing, 10);
 	}
 	
@@ -54,8 +56,9 @@ public class ThingDaoImpl extends BaseDao implements ThingDao {
 	 * It is done recursively
 	 * @param Thing thing
 	 * @return the root Thing inserted
+	 * @throws DatabaseException 
 	 */
-	public Thing createOrUpdateWithRelations(Thing thing, int depth) {
+	public Thing createOrUpdateWithRelations(Thing thing, int depth) throws DatabaseException {
 		for (Entry<String, Set<ThingRelation>> relationsEntry: thing.getRelationsOutgoing().entrySet()) {
 			Set<ThingRelation> thingRelations = relationsEntry.getValue();
 			for (ThingRelation relation: thingRelations) {
@@ -78,19 +81,17 @@ public class ThingDaoImpl extends BaseDao implements ThingDao {
 	 * Executes "CREATE (a#replaceLabel &properties)"
 	 * @param thing
 	 * @return inserted Thing that now has an Id.
+	 * @throws DatabaseException 
 	 * 
 	 */
-	public Thing create(Thing thing) {
+	public Thing create(Thing thing) throws DatabaseException {
 		String query = this.replaceLabels(thing.getLabels(), createQuery);
 		String id = uniqueIdProvider.getId(thing.getLabels());
 		thing.setId(id);
-		//MapSqlParameterSource paramSource = new MapSqlParameterSource();
-		//paramSource.addValue("properties", thing.getProperties());
-		Map<String, Map<String, Object>> params = new HashMap<String, Map<String, Object>>();
+		Map<String, Object> params = new HashMap<>();
 		params.put("properties", thing.getProperties());
 		Result r = this.neo4jOperations.query(query, params);
 		logger.info(r.toString());
-		//this.namedParameterJdbcTemplate.update(query, paramSource);
 		return thing;
 	}
 	
@@ -100,10 +101,10 @@ public class ThingDaoImpl extends BaseDao implements ThingDao {
 	 */
 	public void update(Thing thing) {
 		String query = this.replaceLabels(thing.getLabels(), updateQuery);
-		MapSqlParameterSource paramSource = new MapSqlParameterSource();
-		paramSource.addValue("properties", thing.getProperties());
-		paramSource.addValue("id", thing.getProperty("id"));
-		//this.namedParameterJdbcTemplate.update(query, paramSource);
+		Map<String, Object> params = new HashMap<>();
+		params.put("id", thing.getProperty("id"));
+		params.put("properties", thing.getProperties());
+		this.neo4jOperations.query(query, params);
 	}
 	
 	
@@ -113,11 +114,13 @@ public class ThingDaoImpl extends BaseDao implements ThingDao {
 	 */
 	public void delete(Thing thing) {
 		String query = this.replaceLabels(thing.getLabels(), deleteQuery);
-		//jdbcTemplate.update(query, thing.getProperty("id"));
+		Map<String, Object> params = new HashMap<>();
+		params.put("id", thing.getProperty("id"));
+		this.neo4jOperations.query(query, params);
 	}
 	
 	
-	public Thing get(String id) {
+	public Thing get(String id) throws DatabaseException {
 		ThingFilter filter = new ThingFilter();
 		filter.setProperty("id", id);
 		return getThingByFilter(filter);
@@ -126,29 +129,32 @@ public class ThingDaoImpl extends BaseDao implements ThingDao {
 	
 	/**
 	 * Returns the results by the root thing
+	 * @throws DatabaseException 
 	 */
-	public Thing getThingByFilter(ThingFilter filter) {
+	public Thing getThingByFilter(ThingFilter filter) throws DatabaseException {
 		return this.getResultsByFilter(filter).getRoot();
 	}
 	
 	
 	/**
 	 * Returns results in resultwrapper for easy access by id
+	 * @throws DatabaseException 
 	 * 
 	 */
-	public NeoResultWrapper getResultsByFilter(ThingFilter filter) {
-		MapSqlParameterSource paramSource = new MapSqlParameterSource(filter.getProperties());
-		NeoResultSetExtractor extractor = new NeoResultSetExtractor();
+	public NeoResultWrapper getResultsByFilter(ThingFilter filter) throws DatabaseException {
+		NeoResultExtractor extractor = new NeoResultExtractor();
 		extractor.setRootFilter(filter.getProperties());
-		return null;// this.namedParameterJdbcTemplate.query(filter.getQuery(), paramSource, extractor);
+		Result result = this.neo4jOperations.query(filter.getQuery(), filter.getProperties());
+		return extractor.extractData(result);
 	}
 	
 	/**
 	 * Retruns results as CytoWrapper for network graphs
 	 * @param filter
 	 * @return
+	 * @throws DatabaseException 
 	 */
-	public CytoWrapper getCytoWrapperByFilter(ThingFilter filter) {
+	public CytoWrapper getCytoWrapperByFilter(ThingFilter filter) throws DatabaseException {
 		NeoResultWrapper resultWrapper = this.getResultsByFilter(filter);
 		CytoWrapper cytoWrapper = new CytoWrapper();
 		for (Thing thing: resultWrapper.getThings().values()) {

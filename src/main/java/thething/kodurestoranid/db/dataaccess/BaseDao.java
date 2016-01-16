@@ -9,6 +9,7 @@ import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.neo4j.template.Neo4jOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
@@ -47,7 +48,12 @@ public  class BaseDao {
 		this.uniqueIdProvider = uniqueIdProvider;
 	}
 
-	
+	protected Neo4jOperations neo4jOperations;	
+	@Autowired
+	public void setNeo4jOperations(Neo4jOperations neo4jOperations) {
+		this.neo4jOperations = neo4jOperations;
+	}
+
 	/*
 	private BasicDataSource dataSource;
 	protected JdbcTemplate jdbcTemplate;

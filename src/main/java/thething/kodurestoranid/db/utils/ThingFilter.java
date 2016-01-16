@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import thething.utils.Tools;
 /**
  * Class to represent a Filter that is used to create a query
  * for retrieving a Thing and along with it the full tree of Things

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import thething.exceptions.DatabaseException;
 import thething.kodurestoranid.dataobjects.FieldDescriptor;
 import thething.kodurestoranid.dataobjects.Thing;
 import thething.kodurestoranid.dataobjects.ThingType;
@@ -26,7 +27,7 @@ import thething.kodurestoranid.web.BaseController;
 public class AdminController extends BaseController {
 
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
-	public void createThing(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	public void createThing(HttpServletRequest request, HttpServletResponse response) throws IOException, DatabaseException {
 		logger.info(this.printRequestparams(request.getParameterMap()));
 		ThingType type = requestToType(request);
 		thingDao.createOrUpdateWithRelations(typeDescriptorService.thingFromDescriptor(type));
@@ -38,7 +39,7 @@ public class AdminController extends BaseController {
 	@RequestMapping(value = "/get/json/label/{label}", method = RequestMethod.GET)
 	public Object getJsonByLabel(@PathVariable("label") String label,
 								HttpServletRequest request, 
-								HttpServletResponse response) {
+								HttpServletResponse response) throws DatabaseException {
 		ThingFilter filter = new ThingFilter();
 		filter.setLabel(label);
 		return processJsonRequest(request, response, filter);
@@ -49,14 +50,14 @@ public class AdminController extends BaseController {
 	public Object getJsonById(@PathVariable("property") String property, 
 							@PathVariable("value") String value,
 							HttpServletRequest request, 
-							HttpServletResponse response) {
+							HttpServletResponse response) throws DatabaseException {
 		ThingFilter filter = new ThingFilter();
 		filter.setProperty(property, value);
 		return processJsonRequest(request, response, filter);
 		
 	}
 	
-	private Object processJsonRequest(HttpServletRequest request, HttpServletResponse response, ThingFilter filter) {
+	private Object processJsonRequest(HttpServletRequest request, HttpServletResponse response, ThingFilter filter) throws DatabaseException {
 		Enumeration<String> names = request.getHeaderNames();
 		String responseFormat = request.getParameter("responseFormat");
 		if (responseFormat == null) {

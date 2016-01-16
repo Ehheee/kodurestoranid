@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import thething.kodurestoranid.db.utils.Tools;
+import thething.utils.Tools;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 

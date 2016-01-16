@@ -1,9 +1,8 @@
 package thething.kodurestoranid.db.mapping;
 
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
+
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,27 +10,27 @@ import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.ResultSetExtractor;
+import org.neo4j.ogm.session.result.Result;
 
+import thething.exceptions.DatabaseException;
 import thething.kodurestoranid.dataobjects.Thing;
 import thething.kodurestoranid.dataobjects.ThingRelation;
 import thething.kodurestoranid.db.utils.NeoResultWrapper;
 
-public class NeoResultSetExtractor implements ResultSetExtractor<NeoResultWrapper>{
+public class NeoResultExtractor {
 
 	private final Log logger = LogFactory.getLog(getClass());
 	private Map<String, Object> rootFilter;
-
 	
-	public NeoResultWrapper extractData(ResultSet rs) throws SQLException,
-			DataAccessException {
+	public NeoResultWrapper extractData(Result result) throws DatabaseException {
 		NeoResultWrapper wrapper = new NeoResultWrapper();
 		boolean rootFound = false;
-		while(rs.next()){
-			Thing from = createThing(rs.getObject("from"));
-			Thing to = createThing(rs.getObject("to"));
-			ThingRelation relation = createRelation(rs.getObject("rel"));
+		Iterator<Map<String, Object>> iterator = result.iterator();
+		while (iterator.hasNext()) {
+			Map<String, Object> row = iterator.next();
+			Thing from = createThing(row.get("from"));
+			Thing to = createThing(row.get("to"));
+			ThingRelation relation = createRelation(row.get("rel"));
 			from = wrapper.addThing(from);
 			to = wrapper.addThing(to);
 			relation.setFrom(from);
@@ -45,12 +44,10 @@ public class NeoResultSetExtractor implements ResultSetExtractor<NeoResultWrappe
 					wrapper.setRoot(from);
 				}
 			}
-			
-			
 		}
 		return wrapper;
 	}
-	 
+	
 	private boolean checkRoot(Thing thing) {
 		for (Entry<String, Object> prop: rootFilter.entrySet()) {
 			if (thing.getProperty(prop.getKey()) != null && thing.getProperty(prop.getKey()).equals(prop.getValue())) {
@@ -114,31 +111,12 @@ public class NeoResultSetExtractor implements ResultSetExtractor<NeoResultWrappe
 		return thing;
 	}
 
-
-	protected void dumpColumns(ResultSet rs) throws SQLException {
-	        final ResultSetMetaData meta = rs.getMetaData();
-	        final int cols = meta.getColumnCount();
-	        for (int col=1;col<=cols;col++) {
-	            System.out.println(meta.getColumnName(col));
-	        }
-	    }
-
-	  protected void printMap(Map<String, Object> map){
-		  for(Entry<String, Object> e: map.entrySet()){
-			  logger.info(e.getKey());
-			  logger.info(e.getValue());
-		  }
-	  }
-
-
-
-
 	public Map<String, Object> getRootFilter() {
 		return rootFilter;
 	}
 	public void setRootFilter(Map<String, Object> rootFilter) {
 		this.rootFilter = rootFilter;
 	}
-	  
-	  
+	
+	
 }

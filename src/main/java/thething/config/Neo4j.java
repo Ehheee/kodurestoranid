@@ -18,7 +18,6 @@ public class Neo4j extends Neo4jConfiguration {
 
 	@Bean
 	public Neo4jServer neo4jServer() {
-		System.out.println("BLAAAAAAAAAAAAAAA");
 		return new RemoteServer("http://localhost:7474");
 	}
 
