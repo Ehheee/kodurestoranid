@@ -6,10 +6,10 @@ import java.math.BigDecimal;
 
 import org.junit.Test;
 
-import thething.kodurestoranid.dataobjects.FieldDescriptor;
-import thething.kodurestoranid.dataobjects.Thing;
-import thething.kodurestoranid.dataobjects.ThingType;
-import thething.kodurestoranid.db.services.TypeDescriptorService;
+import thething.one.dataobjects.FieldDescriptor;
+import thething.one.dataobjects.Thing;
+import thething.one.dataobjects.ThingType;
+import thething.one.db.services.TypeDescriptorService;
 
 public class TypeDescriptorTest {
 
