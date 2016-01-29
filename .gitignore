@@ -35,3 +35,8 @@ Icon
 .Spotlight-V100
 .Trashes
 /target
+
+# ECLIPSE
+.classpath
+.project
+.settings/

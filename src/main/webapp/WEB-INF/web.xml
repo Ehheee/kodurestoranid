@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app version="3.0" xmlns="http://java.sun.com/xml/ns/j2ee"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
-  <display-name>thingOne</display-name>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:jsp="http://java.sun.com/xml/ns/javaee/jsp" xmlns:web="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_1.xsd" version="3.1">
+  <display-name>thingone</display-name>
+  <async-supported>true</async-supported>
   <jsp-config>
     <jsp-property-group>
       <url-pattern>*.jsp</url-pattern>
@@ -12,6 +11,7 @@
   <filter>
     <filter-name>encodingFilter</filter-name>
     <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+    <async-supported>true</async-supported>
     <init-param>
       <param-name>encoding</param-name>
       <param-value>UTF-8</param-value>
@@ -27,6 +27,7 @@
   </filter-mapping>
   <filter>
     <filter-name>springSecurityFilterChain</filter-name>
+    <async-supported>true</async-supported>
     <filter-class>
   		org.springframework.web.filter.DelegatingFilterProxy
   	</filter-class>
@@ -36,12 +37,13 @@
     <url-pattern>*</url-pattern>
   </filter-mapping>
   <servlet>
-    <servlet-name>thingOne</servlet-name>
+    <servlet-name>thingone</servlet-name>
     <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
     <load-on-startup>1</load-on-startup>
+    <async-supported>true</async-supported>
   </servlet>
   <servlet-mapping>
-    <servlet-name>thingOne</servlet-name>
+    <servlet-name>thingone</servlet-name>
     <url-pattern>/*</url-pattern>
   </servlet-mapping>
   <listener>
@@ -50,9 +52,9 @@
   <context-param>
     <param-name>contextConfigLocation</param-name>
     <param-value>
-  			/WEB-INF/thingOne_servlet.xml
-  			/WEB-INF/thingOne_security.xml
-  			/WEB-INF/thingOne_data.xml
+  			/WEB-INF/thingone-servlet.xml
+  			/WEB-INF/thingone-security.xml
+  			/WEB-INF/thingone-data.xml
   		</param-value>
   </context-param>
 </web-app>

@@ -24,27 +24,37 @@
 			<name>neo4j maven repository</name>
 			<url>http://m2.neo4j.org/content/repositories/releases/</url>
 		</repository>
+		<repository>
+			<id>spring-io-maven</id>
+			<name>spring IO</name>
+			<url>http://repo.spring.io/libs-milestone</url>
+		</repository>
 	</repositories>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
-			<version>4.1.0.RELEASE</version>
+			<version>4.2.4.RELEASE</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-core</artifactId>
-			<version>4.1.0.RELEASE</version>
+			<version>4.2.4.RELEASE</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-web</artifactId>
-			<version>4.1.0.RELEASE</version>
+			<version>4.2.4.RELEASE</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-webmvc</artifactId>
-			<version>4.1.0.RELEASE</version>
+			<version>4.2.4.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-websocket</artifactId>
+			<version>4.2.4.RELEASE</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.security</groupId>
@@ -140,7 +150,7 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-jdbc</artifactId>
-			<version>4.1.4.RELEASE</version>
+			<version>4.2.4.RELEASE</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.data</groupId>
@@ -157,7 +167,36 @@
 			<artifactId>junit</artifactId>
 			<version>4.9</version>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-messaging</artifactId>
+			<version>4.2.4.RELEASE</version>
+		</dependency>
+ <dependency>
+        <groupId>io.projectreactor</groupId>
+        <artifactId>reactor-core</artifactId>
+        <version>2.0.7.RELEASE</version>
+    </dependency>
+    <dependency>
+        <groupId>io.projectreactor</groupId>
+        <artifactId>reactor-net</artifactId>
+        <version>2.0.7.RELEASE</version>
+    </dependency>
+    <dependency>
+        <groupId>io.projectreactor</groupId>
+        <artifactId>reactor-stream</artifactId>
+        <version>2.0.7.RELEASE</version>
+    </dependency>
+    <dependency>
+        <groupId>io.projectreactor.spring</groupId>
+        <artifactId>reactor-spring-context</artifactId>
+        <version>2.0.7.RELEASE</version>
+    </dependency>
+    <dependency>
+    <groupId>io.netty</groupId>
+    <artifactId>netty-all</artifactId> <!-- Use 'netty-all' for 4.0 or above -->
+    <version>4.0.33.Final</version>
+    <scope>compile</scope>
+  </dependency>
 	</dependencies>
-	
-
 </project>

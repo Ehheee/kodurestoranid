@@ -1,13 +1,11 @@
 package thething.one.web.admin;
 
 import java.io.IOException;
-import java.util.Enumeration;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.map.JsonMappingException;
+import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -57,6 +55,11 @@ public class ThingTypeController extends BaseController {
 		
 	}
 	
+	
+	@MessageMapping("/aa")
+	public Object wsGetJsonByLabel() {
+		return "aaaaaaaaaaa";
+	}
 	private Object processJsonRequest(HttpServletRequest request, HttpServletResponse response, ThingFilter filter) throws DatabaseException {
 		String responseFormat = request.getParameter("responseFormat");
 		if (responseFormat == null) {
@@ -117,5 +120,7 @@ public class ThingTypeController extends BaseController {
 		
 		return type;
 	}
+	
+	
 	
 }

@@ -10,7 +10,7 @@ import thething.one.dataobjects.Thing;
 import thething.one.dataobjects.ThingRelation;
 
 /**
- * Wrap database results in a nice wrapper so it would be possible to get objects by id
+ * Wrap database results, so that it would be possible to get objects by id
  * @author Kaur
  *
  */
