@@ -29,8 +29,9 @@ public class Neo4j extends Neo4jConfiguration {
 
 	// needed for session in view in web-applications
 	@Bean
-	@Scope(value = "session", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	@Scope(value = "websocket", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public Session getSession() throws Exception {
 		return super.getSession();
 	}
+	
 }

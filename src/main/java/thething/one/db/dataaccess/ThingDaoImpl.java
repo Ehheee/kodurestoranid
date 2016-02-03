@@ -144,6 +144,7 @@ public class ThingDaoImpl extends BaseDao implements ThingDao {
 	public NeoResultWrapper getResultsByFilter(ThingFilter filter) throws DatabaseException {
 		NeoResultExtractor extractor = new NeoResultExtractor();
 		extractor.setRootFilter(filter.getProperties());
+		logger.info(filter.getQuery());
 		Result result = this.neo4jOperations.query(filter.getQuery(), filter.getProperties());
 		return extractor.extractData(result);
 	}

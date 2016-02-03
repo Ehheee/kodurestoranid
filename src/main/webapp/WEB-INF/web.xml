@@ -34,7 +34,7 @@
   </filter>
   <filter-mapping>
     <filter-name>springSecurityFilterChain</filter-name>
-    <url-pattern>*</url-pattern>
+    <servlet-name>thingone</servlet-name>
   </filter-mapping>
   <servlet>
     <servlet-name>thingone</servlet-name>
@@ -44,11 +44,16 @@
   </servlet>
   <servlet-mapping>
     <servlet-name>thingone</servlet-name>
-    <url-pattern>/*</url-pattern>
+    <url-pattern>/</url-pattern>
   </servlet-mapping>
   <listener>
     <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
   </listener>
+  <listener>
+            <listener-class>
+                    org.springframework.web.context.request.RequestContextListener 
+            </listener-class>
+    </listener>    
   <context-param>
     <param-name>contextConfigLocation</param-name>
     <param-value>

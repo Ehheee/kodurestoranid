@@ -21,4 +21,9 @@ public class TestController extends BaseController {
 		result.put("and that", "is too");
 		return result;
 	}
+	
+	@RequestMapping(value = "/test2")
+	public String test2() {
+		return "login";
+	}
 }

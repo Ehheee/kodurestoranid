@@ -5,7 +5,8 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
+import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -56,9 +57,33 @@ public class ThingTypeController extends BaseController {
 	}
 	
 	
-	@MessageMapping("/aa")
-	public Object wsGetJsonByLabel() {
-		return "aaaaaaaaaaa";
+	@SubscribeMapping("/label/{label}")
+	public Object wsGetJsonByLabel(@DestinationVariable String label) throws DatabaseException {
+		logger.info("O" + label + "O");
+		ThingFilter filter = new ThingFilter();
+		filter.setLabel(label);
+		return processJsonRequest2(filter, "resultWrapper");
+	}
+	private Object processJsonRequest2(ThingFilter filter, String responseFormat) throws DatabaseException {
+		if (responseFormat == null) {
+			responseFormat = "thing";
+		}
+		Object responseObject = null;
+		switch (responseFormat) {
+		case "cyto" :
+			responseObject = thingDao.getCytoWrapperByFilter(filter);
+			break;
+		case "resultWrapper" :
+			responseObject = thingDao.getResultsByFilter(filter);
+			break;
+		case "thing" :
+			responseObject = thingDao.getThingByFilter(filter);
+			break;
+			
+		default :
+			logger.warn("Illegal responseFormat queried");
+		}
+		return responseObject;
 	}
 	private Object processJsonRequest(HttpServletRequest request, HttpServletResponse response, ThingFilter filter) throws DatabaseException {
 		String responseFormat = request.getParameter("responseFormat");
