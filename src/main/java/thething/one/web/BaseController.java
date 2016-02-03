@@ -8,12 +8,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import thething.one.dataobjects.Thing;
 import thething.one.db.dataaccess.ThingDao;
 import thething.one.db.services.TypeDescriptorService;
 

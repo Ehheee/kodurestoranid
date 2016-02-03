@@ -1,9 +1,5 @@
 package tests;
 
-import java.sql.ResultSet;
-import java.util.ArrayList;
-import java.util.Map;
-
 public class AbstractMapper<K> {
 	
 	private Class<K> type;

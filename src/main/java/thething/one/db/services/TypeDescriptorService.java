@@ -1,9 +1,7 @@
 package thething.one.db.services;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -19,7 +17,6 @@ import thething.one.dataobjects.Thing;
 import thething.one.dataobjects.ThingRelation;
 import thething.one.dataobjects.ThingType;
 import thething.one.db.dataaccess.ThingDao;
-import thething.one.db.dataaccess.ThingDaoImpl;
 import thething.one.db.utils.ThingFilter;
 import thething.utils.Tools;
 

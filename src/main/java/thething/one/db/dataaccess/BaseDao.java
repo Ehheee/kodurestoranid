@@ -1,19 +1,10 @@
 package thething.one.db.dataaccess;
 
 
-import java.util.Collection;
-
-import javax.sql.DataSource;
-
-import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.neo4j.template.Neo4jOperations;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-
 import thething.one.db.services.TypeDescriptorService;
 
 public  class BaseDao {
