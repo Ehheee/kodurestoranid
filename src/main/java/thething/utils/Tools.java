@@ -31,7 +31,7 @@ public class Tools {
 		return classes.get(s);
 	}
 	public static String mapToString(SortedMap<String, Object> map) {
-		StringBuilder sb = new StringBuilder("Thing: {");
+		StringBuilder sb = new StringBuilder("{");
 		String comma = "";
 		for (String s: map.keySet()) {
 			sb.append(comma).append(s).append(": ").append(map.get(s));

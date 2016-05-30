@@ -62,7 +62,7 @@ public class ThingFilter {
 			sb.append("{ ");
 			String comma = "";
 			for (Entry<String, Object> e: properties.entrySet()) {
-				sb.append(comma).append(e.getKey()).append(": &").append(e.getKey());
+				sb.append(comma).append(e.getKey()).append(": {").append(e.getKey()).append("}");
 				comma = ", ";
 			}
 			sb.append(" }");

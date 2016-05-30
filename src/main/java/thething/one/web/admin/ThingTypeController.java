@@ -1,6 +1,9 @@
 package thething.one.web.admin;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -9,6 +12,7 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -20,6 +24,7 @@ import thething.one.dataobjects.ThingType;
 import thething.one.db.utils.RequestWrapper;
 import thething.one.db.utils.ThingFilter;
 import thething.one.web.BaseController;
+import thething.utils.ThingTools;
 
 @Controller
 @RequestMapping("/thingtype")
@@ -33,6 +38,11 @@ public class ThingTypeController extends BaseController {
 		response.getWriter().write("it works");
 	}
 	
+	@RequestMapping(value = "/json/create", method = RequestMethod.POST)
+	@ResponseBody
+	public Object createThing(@RequestBody Map<String, Object> request) throws DatabaseException {
+		return this.createOrUpdateThing(request);
+	}
 
 	@ResponseBody
 	@RequestMapping(value = "/get/json/label/{label}", method = RequestMethod.GET)
@@ -41,7 +51,7 @@ public class ThingTypeController extends BaseController {
 								HttpServletResponse response) throws DatabaseException {
 		ThingFilter filter = new ThingFilter();
 		filter.setLabel(label);
-		return processJsonRequest(request, response, filter);
+		return createJsonResponse(request, response, filter);
 	}
 	
 	@ResponseBody
@@ -52,14 +62,13 @@ public class ThingTypeController extends BaseController {
 							HttpServletResponse response) throws DatabaseException {
 		ThingFilter filter = new ThingFilter();
 		filter.setProperty(property, value);
-		return processJsonRequest(request, response, filter);
+		return createJsonResponse(request, response, filter);
 		
 	}
 	
 	
 	@SubscribeMapping("/label/{label}")
 	public Object wsGetJsonByLabel(@DestinationVariable String label) throws DatabaseException {
-		logger.info("O" + label + "O");
 		ThingFilter filter = new ThingFilter();
 		filter.setLabel(label);
 		return processJsonRequest2(filter, "resultWrapper");
@@ -82,29 +91,6 @@ public class ThingTypeController extends BaseController {
 			
 		default :
 			logger.warn("Illegal responseFormat queried");
-		}
-		return responseObject;
-	}
-	private Object processJsonRequest(HttpServletRequest request, HttpServletResponse response, ThingFilter filter) throws DatabaseException {
-		String responseFormat = request.getParameter("responseFormat");
-		if (responseFormat == null) {
-			responseFormat = "thing";
-		}
-		Object responseObject = null;
-		switch (responseFormat) {
-		case "cyto" :
-			responseObject = thingDao.getCytoWrapperByFilter(filter);
-			break;
-		case "resultWrapper" :
-			responseObject = thingDao.getResultsByFilter(filter);
-			break;
-		case "thing" :
-			responseObject = thingDao.getThingByFilter(filter);
-			break;
-			
-		default :
-			logger.warn("Illegal responseFormat queried");
-			this.sendError(response, HttpServletResponse.SC_NOT_ACCEPTABLE);
 		}
 		return responseObject;
 	}

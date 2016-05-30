@@ -8,6 +8,7 @@
                                  http://www.springframework.org/schema/security/spring-security-4.0.xsd">
                               
 	<http auto-config="true" use-expressions="true" request-matcher="regex">
+		<csrf disabled="true"/>
 		<intercept-url pattern="/login" access="permitAll" />
 		<!-- 
 		<intercept-url pattern="/.*$" access="hasAnyRole('ROLE_ADMIN', 'ROLE_USER')" />

@@ -17,14 +17,12 @@ public class ThingType {
 	public void setId(String id) {
 		this.id = id;
 	}
-
 	public ThingType(){
 		fields = new HashMap<String, FieldDescriptor>();
 	}
-	
 	public void addField(FieldDescriptor field){
 		fields.put(field.getName(), field);
-	}   
+	}
 	public String getTypeName() {
 		return typeName;
 	}
@@ -37,7 +35,6 @@ public class ThingType {
 	public void setFields(Map<String, FieldDescriptor> fields) {
 		this.fields = fields;
 	}
-	
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("TypeDescriptor:").append(typeName).append("[ ");
@@ -51,8 +48,6 @@ public class ThingType {
 		sb.append(" ]");
 		return sb.toString();
 	}
-	
-	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -98,9 +93,4 @@ public class ThingType {
 		}
 		return true;
 	}
-
-	
-	
-	
-	
 }

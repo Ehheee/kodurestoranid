@@ -18,6 +18,7 @@ import thething.exceptions.DatabaseException;
 import thething.one.dataobjects.Thing;
 import thething.one.dataobjects.ThingRelation;
 import thething.one.db.utils.NeoResultWrapper;
+import thething.utils.ThingTools;
 
 public class NeoResultExtractor {
 
@@ -65,7 +66,7 @@ public class NeoResultExtractor {
 	@SuppressWarnings("unchecked")
 	private Thing createThing(Object object) {
 		if (object instanceof LinkedHashMap) {
-			return createThing((LinkedHashMap<String, Object> )object);
+			return ThingTools.createThing((LinkedHashMap<String, Object> )object);
 		}
 		return null;
 	}
@@ -77,10 +78,6 @@ public class NeoResultExtractor {
 		}
 		return null;
 	}
-
-
-
-
 	@SuppressWarnings("unchecked")
 	private ThingRelation createRelation(LinkedHashMap<String, Object> m) {
 		ThingRelation relation = new ThingRelation();
@@ -89,31 +86,6 @@ public class NeoResultExtractor {
 		logger.info(relation);
 		return relation;
 	}
-
-
-
-	@SuppressWarnings("unchecked")
-	private Thing createThing(LinkedHashMap<String, Object> m) {
-		Thing thing = new Thing();
-		for (Entry<String, Object> entry: m.entrySet()) {
-			if (entry.getKey() == "labels" ){
-				if (entry.getValue() instanceof ArrayList) {
-					thing.setLabels((List<String>) entry.getValue());
-				}
-			}
-			
-			if (entry.getKey() == "data") {
-				if (entry.getValue() instanceof LinkedHashMap) {
-					SortedMap<String, Object> props = new TreeMap<>((Map<String, Object>) entry.getValue());
-					thing.setProperties(props);
-				}
-				
-			}
-		}
-		logger.info(thing);
-		return thing;
-	}
-
 	public Map<String, Object> getRootFilter() {
 		return rootFilter;
 	}

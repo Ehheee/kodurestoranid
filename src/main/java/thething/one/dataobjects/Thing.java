@@ -140,7 +140,8 @@ public class Thing {
 	}
 	
 	public String toString() {
-		return Tools.mapToString(getProperties());
+		StringBuilder sb = new StringBuilder("Thing: { labels: ").append(Tools.stringFromLabels(labels)).append(", properties: ").append(Tools.mapToString(properties)).append("}");
+		return sb.toString();
 	}
 	
 }
